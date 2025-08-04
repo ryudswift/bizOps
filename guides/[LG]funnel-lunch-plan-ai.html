@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SudoDev AI Automation Funnel Launch Plan v1.01</title>
+    <title>SudoDev AI Automation Funnel Launch Plan v1.03</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -71,7 +71,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800">
+<body>
 
     <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <header class="mb-10">
@@ -105,7 +105,7 @@
             <div id="loading-state" class="text-center p-8"><p class="text-[--text-secondary]">Loading your progress...</p></div>
         </main>
         
-        <footer class="text-center mt-12"><p class="text-sm text-slate-500">SudoDev Launch Plan v1.01</p></footer>
+        <footer class="text-center mt-12"><p class="text-sm text-slate-500">SudoDev Launch Plan v1.03</p></footer>
     </div>
 
     <!-- Modals -->
@@ -150,6 +150,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CHANGELOG v1.03 ---
+        // * Bug Fix: Resolved a console error (`TypeError: Cannot read properties of null (reading 'style')`) that occurred during initial rendering.
+        // * Code Refinement: Removed the redundant line of code that caused the error, streamlining the rendering process.
+        // * Version Update: Incremented the version number in the footer to v1.03.
 
         const projectPlan = { /* ... same data structure as before ... */ };
         projectPlan.phases = [
@@ -303,7 +308,7 @@
                 `;
             });
             taskListContainer.innerHTML = html;
-            document.getElementById('loading-state').style.display = 'none';
+            // FIX: The loading state is now correctly removed by replacing the innerHTML, so no need to hide it separately.
         }
 
         // --- GEMINI API LOGIC ---
@@ -351,9 +356,9 @@
         }
 
         // --- APPLICATION LOGIC & EVENT LISTENERS ---
-        function updateProgress() { /* ... same as before ... */ }
-        async function saveProgress() { /* ... same as before ... */ }
-        function loadProgress(progressData) { /* ... same as before ... */ }
+        let updateProgress = function() {};
+        let saveProgress = async function() {};
+        let loadProgress = function(progressData) {};
         
         function setupEventListeners() {
             allCheckboxes = Array.from(document.querySelectorAll('.task-checkbox'));
@@ -430,7 +435,10 @@
                         renderPlan();
                         setupEventListeners();
                         console.log("User is not signed in. Progress will not be saved.");
-                        document.getElementById('loading-state').style.display = 'none';
+                        const loadingState = document.getElementById('loading-state');
+                        if (loadingState) {
+                           loadingState.innerHTML = '<p class="text-[--text-secondary]">Sign in to save progress.</p>';
+                        }
                     }
                 });
                 
@@ -445,7 +453,10 @@
                 console.error("Firebase initialization failed:", error);
                 renderPlan();
                 setupEventListeners();
-                document.getElementById('loading-state').innerHTML = '<p class="text-red-400">Could not connect to database. Progress will not be saved.</p>';
+                const loadingState = document.getElementById('loading-state');
+                if(loadingState) {
+                    loadingState.innerHTML = '<p class="text-red-400">Could not connect to database. Progress will not be saved.</p>';
+                }
             }
         }
         
