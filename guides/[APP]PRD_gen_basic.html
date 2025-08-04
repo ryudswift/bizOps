@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD Agent Input</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;600&display=swap');
+
+        :root {
+            --background-color: #0a0a0c;
+            --text-color: #e4e4e7;
+            --primary-color: #2563eb;
+            --secondary-color: #3f3f46;
+            --glass-bg: rgba(18, 18, 20, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-color: #ffffff;
+            --sub-text-color: #a1a1aa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .top-actions {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: var(--sub-text-color);
+            margin-bottom: 2.5rem;
+        }
+
+        #prd-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        textarea {
+            background-color: #1a1a1c;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+
+        .submit-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover { background-color: #1d4ed8; }
+        
+        .action-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover { background-color: #52525b; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            color: var(--header-color);
+            font-weight: 600;
+            margin-right: auto;
+        }
+
+        .close-button {
+            color: #aaa;
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #results-container {
+            overflow-y: auto;
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        /* History Panel */
+        .history-panel {
+            position: fixed;
+            top: 0;
+            right: -350px; /* Start off-screen */
+            width: 320px;
+            height: 100%;
+            background-color: #111113;
+            border-left: 1px solid var(--border-color);
+            box-shadow: -10px 0 20px rgba(0,0,0,0.2);
+            transition: right 0.3s ease-in-out;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+        }
+        .history-panel.visible {
+            right: 0;
+        }
+        .history-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+        }
+        #history-list li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #history-list li:hover {
+            background-color: var(--secondary-color);
+        }
+        #history-list li .name {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        #history-list li .date {
+            font-size: 0.8rem;
+            color: var(--sub-text-color);
+        }
+
+
+        /* Results Formatting */
+        #results h1, #results h2, #results h3 { color: var(--header-color); }
+        #results h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; }
+        #results h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        #results p, #results li { color: var(--sub-text-color); line-height: 1.6; }
+        #results pre {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-actions">
+        <button id="history-btn" class="action-button">History</button>
+    </div>
+
+    <div class="main-container">
+        <h1>PRD Agent</h1>
+        <p>Enter your core project idea below. The AI will generate a structured Product Requirements Document to get you started.</p>
+        <form id="prd-form">
+            <textarea id="idea-input" placeholder="e.g., A multi-step content generation app..." required></textarea>
+            <button type="submit" class="submit-button">Generate PRD</button>
+        </form>
+    </div>
+
+    <div id="prd-modal" class="modal">
+        <div class="modal-content">
+             <div class="modal-header">
+                <span id="modal-title" class="modal-title">Generated Document</span>
+                <button id="download-md-btn" class="action-button">Download .md</button>
+                <button id="close-modal" class="close-button">&times;</button>
+            </div>
+            <div id="results-container">
+                <div id="results">
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="history-panel" class="history-panel">
+        <div class="history-header">
+            <h3>History</h3>
+            <button id="close-history" class="close-button">&times;</button>
+        </div>
+        <ul id="history-list">
+            </ul>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('prd-form');
+        const ideaInput = document.getElementById('idea-input');
+        const modal = document.getElementById('prd-modal');
+        const closeModal = document.getElementById('close-modal');
+        const downloadBtn = document.getElementById('download-md-btn');
+        const modalTitle = document.getElementById('modal-title');
+        const resultsDiv = document.getElementById('results');
+        const historyBtn = document.getElementById('history-btn');
+        const historyPanel = document.getElementById('history-panel');
+        const closeHistoryBtn = document.getElementById('close-history');
+        const historyList = document.getElementById('history-list');
+
+        const webhookUrl = 'https://n8n.sudev.site/webhook/871dd35d-6cb7-4ded-abc1-2e044648998e';
+        let currentMarkdownContent = '';
+        let isLocalStorageAvailable = false;
+
+        // --- CHECK FOR LOCALSTORAGE AVAILABILITY ---
+        try {
+            localStorage.setItem('test', 'test');
+            localStorage.removeItem('test');
+            isLocalStorageAvailable = true;
+        } catch (e) {
+            isLocalStorageAvailable = false;
+            console.warn("LocalStorage is not available. History feature will be disabled.");
+            historyBtn.style.display = 'none';
+        }
+
+        // --- RENDER & CONVERT FUNCTIONS ---
+        function renderPRD(prdData) {
+            // This function renders the HTML view in the modal
+            if (!prdData) return;
+            let html = `<h1>${prdData.productName}</h1>`;
+            const { supabase, n8n, frontend } = prdData.technicalSetup;
+            html += `<h2>Project Context</h2><p><strong>Product Type:</strong> ${prdData.projectContext.productType}</p><p><strong>Core Value:</strong> ${prdData.projectContext.coreValueProposition}</p>`;
+            html += `<h3>Tech Stack</h3><p><strong>Frontend:</strong> ${prdData.projectContext.techStack.frontend}</p><p><strong>Backend:</strong> ${prdData.projectContext.techStack.backend}</p><p><strong>Database & Auth:</strong> ${prdData.projectContext.techStack.databaseAuth}</p>`;
+            html += `<h2>Technical Setup</h2><h3>Supabase Setup</h3><p>${supabase.readme.replace(/\n/g, '<br>')}</p><h4>Database Schema (SQL)</h4><pre><code>${supabase.schemaSql}</code></pre>`;
+            html += `<h3>n8n Setup</h3><p>${n8n.readme.replace(/\n/g, '<br>')}</p><h4>Workflow Logic</h4>`;
+            n8n.workflowLogic.forEach(step => { html += `<div><p><strong>Step ${step.step}: ${step.node}</strong></p><p>${step.details}</p></div>`; });
+            html += `<h3>Frontend Setup</h3><p>${frontend.readme.replace(/\n/g, '<br>')}</p><h4>Environment Variables (.env.local)</h4><pre><code>${frontend.environmentVariables.join('\n')}</code></pre>`;
+            resultsDiv.innerHTML = html;
+            modalTitle.textContent = prdData.productName;
+        }
+
+        function convertToMarkdown(prdData) {
+            if (!prdData) return '';
+            const { productName, projectContext, technicalSetup } = prdData;
+            let md = `# ${productName}\n\n## Project Context\n\n`;
+            md += `**Product Type:** ${projectContext.productType}\n\n`;
+            md += `**Core Value Proposition:**\n${projectContext.coreValueProposition}\n\n`;
+            md += `### Tech Stack\n- **Frontend:** ${projectContext.techStack.frontend}\n- **Backend:** ${projectContext.techStack.backend}\n- **Database & Auth:** ${projectContext.techStack.databaseAuth}\n\n`;
+            md += `## Technical Setup\n\n`;
+            const { supabase, n8n, frontend } = technicalSetup;
+            md += `### Supabase Setup\n\n${supabase.readme}\n\n#### Database Schema (SQL)\n\`\`\`sql\n${supabase.schemaSql}\n\`\`\`\n\n`;
+            md += `### n8n Setup\n\n${n8n.readme}\n\n#### Workflow Logic\n\n`;
+            n8n.workflowLogic.forEach(step => { md += `**Step ${step.step}: ${step.node}**\n> ${step.details}\n\n`; });
+            md += `### Frontend Setup\n\n${frontend.readme}\n\n#### Environment Variables (.env.local)\n\`\`\`\n${frontend.environmentVariables.join('\n')}\n\`\`\`\n`;
+            return md;
+        }
+
+        // --- HISTORY MANAGEMENT ---
+        function getHistory() {
+            if (!isLocalStorageAvailable) return [];
+            return JSON.parse(localStorage.getItem('prdHistory') || '[]');
+        }
+
+        function saveToHistory(prdData) {
+            if (!isLocalStorageAvailable) return;
+            let history = getHistory();
+            const newEntry = {
+                id: Date.now(),
+                name: prdData.productName,
+                date: new Date().toISOString(),
+                data: prdData
+            };
+            history.unshift(newEntry);
+            if (history.length > 15) history.pop();
+            localStorage.setItem('prdHistory', JSON.stringify(history));
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            if (!isLocalStorageAvailable) return;
+            const history = getHistory();
+            historyList.innerHTML = '';
+            if (history.length === 0) {
+                historyList.innerHTML = '<li>No history yet.</li>';
+                return;
+            }
+            history.forEach(entry => {
+                const li = document.createElement('li');
+                li.dataset.id = entry.id;
+                li.innerHTML = `<span class="name">${entry.name}</span><span class="date">${new Date(entry.date).toLocaleString()}</span>`;
+                li.addEventListener('click', () => {
+                    displayFromHistory(entry.id);
+                    historyPanel.classList.remove('visible');
+                });
+                historyList.appendChild(li);
+            });
+        }
+        
+        function displayFromHistory(id) {
+            const history = getHistory();
+            const entry = history.find(item => item.id == id);
+            if (entry) {
+                renderPRD(entry.data);
+                currentMarkdownContent = convertToMarkdown(entry.data);
+                modal.style.display = 'flex';
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            resultsDiv.innerHTML = '<h2>Generating your document...</h2>';
+            modal.style.display = 'flex';
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ chat: ideaInput.value, type: 'step01' }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error(`Webhook Error: ${response.status}`);
+                const responseData = await response.json();
+                const prdData = responseData[0]?.output;
+                
+                if (!prdData) throw new Error('Invalid data format from server.');
+                
+                renderPRD(prdData);
+                currentMarkdownContent = convertToMarkdown(prdData);
+                saveToHistory(prdData);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<h2 style="color: #f87171;">Error</h2><p>${error.message}</p>`;
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (currentMarkdownContent) {
+                const a = document.createElement("a");
+                const file = new Blob([currentMarkdownContent], { type: 'text/markdown;charset=utf-8;' });
+                a.href = URL.createObjectURL(file);
+                a.download = 'download.md';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+        });
+
+        // Modal and Panel Controls
+        closeModal.onclick = () => { modal.style.display = 'none'; };
+        historyBtn.onclick = () => { historyPanel.classList.add('visible'); };
+        closeHistoryBtn.onclick = () => { historyPanel.classList.remove('visible'); };
+        window.onclick = (event) => {
+            if (event.target == modal) modal.style.display = 'none';
+        };
+        
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isLocalStorageAvailable) {
+                renderHistoryList();
+            }
+        });
+
+    </script>
+</body>
+</html>
