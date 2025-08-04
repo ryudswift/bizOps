@@ -6,37 +6,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script>
-        // Set up TailwindCSS for dark mode
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
     <style>
-        /* Custom scrollbar for a better look in dark/light themes */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         html.dark ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-        html.dark ::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.4); }
         html:not(.dark) ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; }
-        html:not(.dark) ::-webkit-scrollbar-thumb:hover { background-color: rgba(0, 0, 0, 0.4); }
-        
-        /* Glassmorphism effect */
-        .glass-modal {
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        html.dark .glass-modal {
-            background: rgba(30, 41, 59, 0.5); /* Darker glass for dark mode */
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        html:not(.dark) .glass-modal {
-            background: rgba(255, 255, 255, 0.5); /* Lighter glass for light mode */
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        /* Hide modals initially */
+        .glass-modal { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        html.dark .glass-modal { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); }
+        html:not(.dark) .glass-modal { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.18); }
         .modal { display: none; }
         .modal.flex { display: flex; }
     </style>
@@ -50,8 +29,8 @@
                 <button id="history-btn" class="hover:text-blue-500 transition-colors">History</button>
                 <button id="changelog-btn" class="hover:text-blue-500 transition-colors">Changelog</button>
                 <button id="theme-switcher" class="text-xl">
-                    <span class="dark-icon">☀️</span>
-                    <span class="light-icon">🌙</span>
+                    <span class="dark-icon" style="display: none;">☀️</span>
+                    <span class="light-icon" style="display: none;">🌙</span>
                 </button>
             </div>
         </div>
@@ -71,201 +50,72 @@
         </form>
     </main>
 
-    <div id="loading-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70">
-        <div class="glass-modal rounded-2xl p-6 w-11/12 max-w-md h-64 flex flex-col">
-            <h2 class="text-xl font-bold mb-4 text-center">Generating Your PRD...</h2>
-            <div id="animation-container" class="flex-grow"></div>
-        </div>
-    </div>
-
-    <div id="result-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4">
-        <div class="glass-modal rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
-            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                <h2 id="result-title" class="text-2xl font-bold">Generated PRD Details</h2>
-                <button id="close-result-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-            </div>
-            <div id="result-content" class="overflow-y-auto pr-2"></div>
-            <div class="mt-6 flex flex-col sm:flex-row sm:justify-end gap-2 flex-shrink-0">
-                <button id="copy-markdown-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Markdown</button>
-                <button id="copy-json-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Raw JSON</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="changelog-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4">
-        <div class="glass-modal rounded-2xl p-6 w-full max-w-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Changelog</h2>
-                <button id="close-changelog-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-            </div>
-            <div class="space-y-4 text-gray-700 dark:text-gray-300">
-                <div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Version 1.0 <span class="text-sm font-normal text-gray-500 dark:text-gray-400">- Aug 4, 2025</span></h3>
-                    <ul class="list-disc pl-5 mt-1 space-y-1">
-                        <li>Complete UI overhaul using TailwindCSS for a modern aesthetic.</li>
-                        <li>Added Dark/Light theme switcher with preference saved to browser.</li>
-                        <li>Implemented a fixed navigation bar for key actions.</li>
-                        <li>Added this changelog modal.</li>
-                        <li>Re-integrated and restyled the History feature.</li>
-                        <li>Upgraded loading animation to an interactive canvas-based animation.</li>
-                        <li>Enhanced result display for better readability.</li>
-                    </ul>
-                </div>
-                 <div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Pre-release Versions</h3>
-                    <ul class="list-disc pl-5 mt-1 space-y-1">
-                        <li>Added `localStorage` support for history, with graceful degradation.</li>
-                        <li>Added a 'Download .md' feature.</li>
-                        <li>Developed the core webhook integration and PRD generation logic.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="loading-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70"><div class="glass-modal rounded-2xl p-6 w-11/12 max-w-md h-64 flex flex-col"><h2 class="text-xl font-bold mb-4 text-center">Generating Your PRD...</h2><div id="animation-container" class="flex-grow"></div></div></div>
+    <div id="result-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4"><div class="glass-modal rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col my-8"><div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 id="result-title" class="text-2xl font-bold">Generated PRD</h2><button id="close-result-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><div id="result-content" class="overflow-y-auto pr-2"></div><div class="mt-6 flex flex-col sm:flex-row sm:justify-end gap-2 flex-shrink-0"><button id="download-md-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition">Download .md</button><button id="copy-markdown-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Markdown</button><button id="copy-json-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Raw JSON</button></div></div></div>
+    <div id="changelog-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4"><div class="glass-modal rounded-2xl p-6 w-full max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Changelog</h2><button id="close-changelog-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><div class="space-y-4 text-gray-700 dark:text-gray-300"><div><h3 class="font-bold text-lg text-gray-900 dark:text-white">Version 1.01 <span class="text-sm font-normal text-gray-500 dark:text-gray-400">- Aug 4, 2025</span></h3><ul class="list-disc pl-5 mt-1 space-y-1"><li>Added 'Download .md' button with dynamic filenames based on the generated product name.</li></ul></div><div><h3 class="font-bold text-lg text-gray-900 dark:text-white">Version 1.0</h3><ul class="list-disc pl-5 mt-1 space-y-1"><li>Complete UI overhaul using TailwindCSS.</li><li>Added Dark/Light theme switcher.</li><li>Implemented a fixed navigation bar, changelog, and history feature.</li><li>Upgraded loading animation.</li><li>Corrected n8n prompts to generate dynamic content instead of hardcoded examples.</li><li>Improved frontend error handling for JSON parsing.</li></ul></div></div></div></div>
     
-    <div id="history-panel" class="fixed top-0 right-[-100%] sm:right-[-400px] w-full sm:w-96 h-full bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 z-50 flex flex-col">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="font-bold text-lg">Generation History</h3>
-            <button id="close-history" class="text-2xl">&times;</button>
-        </div>
-        <ul id="history-list" class="overflow-y-auto"></ul>
-    </div>
-
+    <div id="history-panel" class="fixed top-0 right-[-100%] sm:right-[-400px] w-full sm:w-96 h-full bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 z-50 flex flex-col"><div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700"><h3 class="font-bold text-lg">History</h3><button id="close-history" class="text-2xl">&times;</button></div><ul id="history-list" class="overflow-y-auto"></ul></div>
 
     <script>
+        // --- SCRIPT START ---
         const WEBHOOK_URL = 'https://n8n.sudev.site/webhook/871dd35d-6cb7-4ded-abc1-2e044648998e';
 
-        // DOM Elements
-        const ideaForm = document.getElementById('idea-form');
-        const loadingModal = document.getElementById('loading-modal');
-        const resultModal = document.getElementById('result-modal');
-        const resultContent = document.getElementById('result-content');
-        const resultTitle = document.getElementById('result-title');
-        const closeResultModalBtn = document.getElementById('close-result-modal');
-        const copyMarkdownBtn = document.getElementById('copy-markdown-btn');
-        const copyJsonBtn = document.getElementById('copy-json-btn');
-        const animationContainer = document.getElementById('animation-container');
-        const themeSwitcher = document.getElementById('theme-switcher');
-        const historyBtn = document.getElementById('history-btn');
-        const historyPanel = document.getElementById('history-panel');
-        const closeHistoryBtn = document.getElementById('close-history');
-        const historyList = document.getElementById('history-list');
-        const changelogBtn = document.getElementById('changelog-btn');
-        const changelogModal = document.getElementById('changelog-modal');
-        const closeChangelogModalBtn = document.getElementById('close-changelog-modal');
+        // DOM Elements & State
+        const elements = {
+            ideaForm: document.getElementById('idea-form'),
+            loadingModal: document.getElementById('loading-modal'),
+            resultModal: document.getElementById('result-modal'),
+            resultContent: document.getElementById('result-content'),
+            resultTitle: document.getElementById('result-title'),
+            closeResultModalBtn: document.getElementById('close-result-modal'),
+            downloadMdBtn: document.getElementById('download-md-btn'),
+            copyMarkdownBtn: document.getElementById('copy-markdown-btn'),
+            copyJsonBtn: document.getElementById('copy-json-btn'),
+            animationContainer: document.getElementById('animation-container'),
+            themeSwitcher: document.getElementById('theme-switcher'),
+            historyBtn: document.getElementById('history-btn'),
+            historyPanel: document.getElementById('history-panel'),
+            closeHistoryBtn: document.getElementById('close-history'),
+            historyList: document.getElementById('history-list'),
+            changelogBtn: document.getElementById('changelog-btn'),
+            changelogModal: document.getElementById('changelog-modal'),
+            closeChangelogModalBtn: document.getElementById('close-changelog-modal')
+        };
         
-        let currentPrdData = null; // Store the latest full PRD data object
+        let currentPrdData = null;
         let isLocalStorageAvailable = false;
 
         // --- THEME SWITCHER LOGIC ---
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            themeSwitcher.querySelector('.dark-icon').style.display = theme === 'dark' ? 'block' : 'none';
-            themeSwitcher.querySelector('.light-icon').style.display = theme === 'light' ? 'block' : 'none';
-        }
+        const applyTheme = (theme) => {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            elements.themeSwitcher.querySelector('.dark-icon').style.display = theme === 'dark' ? 'block' : 'none';
+            elements.themeSwitcher.querySelector('.light-icon').style.display = theme === 'light' ? 'block' : 'none';
+        };
 
-        themeSwitcher.addEventListener('click', () => {
-            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
-        });
-        
-        // --- ANIMATION LOGIC ---
-        function createSpaceAnimation() {
-            // Complex canvas animation logic from the user's provided file
-            animationContainer.innerHTML = '';
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = animationContainer.clientWidth;
-            canvas.height = animationContainer.clientHeight;
-            animationContainer.appendChild(canvas);
-            const stars = Array.from({ length: 150 }, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.5 + 0.1 }));
-            const orb = { x: canvas.width / 2, y: canvas.height / 2, radius: 20, pulseDirection: 1 };
-            
-            function animate() {
-                if (loadingModal.style.display !== 'flex') return; // Stop animation if modal is hidden
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'white';
-                stars.forEach(s => {
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    s.y += s.speed;
-                    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
-                });
-                const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
-                gradient.addColorStop(0, 'rgba(100, 100, 255, 1)');
-                gradient.addColorStop(1, 'rgba(100, 100, 255, 0)');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
-                ctx.fill();
-                orb.radius += 0.2 * orb.pulseDirection;
-                if (orb.radius > 30 || orb.radius < 15) orb.pulseDirection *= -1;
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
+        // --- ANIMATION ---
+        const createSpaceAnimation = () => { /* Animation logic remains the same */ elements.animationContainer.innerHTML = ''; const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = elements.animationContainer.clientWidth; canvas.height = elements.animationContainer.clientHeight; elements.animationContainer.appendChild(canvas); const stars = Array.from({ length: 150 }, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.5 + 0.1 })); const orb = { x: canvas.width / 2, y: canvas.height / 2, radius: 20, pulseDirection: 1 }; function animate() { if (!elements.loadingModal.classList.contains('flex')) return; ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = document.documentElement.classList.contains('dark') ? 'white' : 'black'; stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); s.y += s.speed; if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; } }); const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius); gradient.addColorStop(0, 'rgba(100, 100, 255, 1)'); gradient.addColorStop(1, 'rgba(100, 100, 255, 0)'); ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2); ctx.fill(); orb.radius += 0.2 * orb.pulseDirection; if (orb.radius > 30 || orb.radius < 15) orb.pulseDirection *= -1; requestAnimationFrame(animate); } animate(); };
 
         // --- DATA DISPLAY & FORMATTING ---
-        function displayResult(prdData) {
+        const displayResult = (prdData) => {
             currentPrdData = prdData;
-            resultTitle.textContent = prdData.productName || 'Generated PRD';
-            
+            elements.resultTitle.textContent = prdData.productName || 'Generated PRD';
             const renderList = (items) => items && items.length > 0 ? items.map(item => `<li class="mb-1"><code>${item}</code></li>`).join('') : '<li>N/A</li>';
             const renderWorkflow = (steps) => steps && steps.length > 0 ? steps.map(step => `<div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 mt-2"><p class="font-medium">Step ${step.step}: ${step.node}</p><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">${step.details || 'N/A'}</p></div>`).join('') : '<p>N/A</p>';
+            elements.resultContent.innerHTML = `<div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Project Context</h3><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg space-y-3"><p><span class="font-semibold">Type:</span> ${prdData.projectContext?.productType || 'N/A'}</p><p><span class="font-semibold">Value:</span> ${prdData.projectContext?.coreValueProposition || 'N/A'}</p><div><h4 class="font-semibold mb-2">Tech Stack:</h4><ul class="list-disc pl-5"><li>Frontend: ${prdData.projectContext?.techStack?.frontend || 'N/A'}</li><li>Backend: ${prdData.projectContext?.techStack?.backend || 'N/A'}</li><li>DB/Auth: ${prdData.projectContext?.techStack?.databaseAuth || 'N/A'}</li></ul></div></div></div> <div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Technical Setup</h3><div class="space-y-4"> <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Supabase</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Schema SQL:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.schemaSql || 'N/A'}</pre></div></div> <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">n8n</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.n8n?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Workflow Logic:</p><div>${renderWorkflow(prdData.technicalSetup?.n8n?.workflowLogic)}</div></div></div> <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Frontend</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.frontend?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Environment Variables:</p><ul class="list-disc pl-5">${renderList(prdData.technicalSetup?.frontend?.environmentVariables)}</ul></div></div> </div></div>`;
+        };
 
-            resultContent.innerHTML = `
-                <div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Project Context</h3><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg space-y-3"><p><span class="font-semibold">Type:</span> ${prdData.projectContext?.productType || 'N/A'}</p><p><span class="font-semibold">Value:</span> ${prdData.projectContext?.coreValueProposition || 'N/A'}</p><div><h4 class="font-semibold mb-2">Tech Stack:</h4><ul class="list-disc pl-5"><li>Frontend: ${prdData.projectContext?.techStack?.frontend || 'N/A'}</li><li>Backend: ${prdData.projectContext?.techStack?.backend || 'N/A'}</li><li>DB/Auth: ${prdData.projectContext?.techStack?.databaseAuth || 'N/A'}</li></ul></div></div></div>
-                <div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Technical Setup</h3><div class="space-y-4">
-                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Supabase</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Schema SQL:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.schemaSql || 'N/A'}</pre></div></div>
-                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">n8n</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.n8n?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Workflow Logic:</p><div>${renderWorkflow(prdData.technicalSetup?.n8n?.workflowLogic)}</div></div></div>
-                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Frontend</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.frontend?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Environment Variables:</p><ul class="list-disc pl-5">${renderList(prdData.technicalSetup?.frontend?.environmentVariables)}</ul></div></div>
-                </div></div>`;
-        }
-
-        function formatPrdAsMarkdown(prdData) {
-            if (!prdData) return '';
-            const tech = prdData.projectContext?.techStack || {};
-            const setup = prdData.technicalSetup || {};
-            const n8nLogic = setup.n8n?.workflowLogic || [];
-            const feVars = setup.frontend?.environmentVariables || [];
-            return `# ${prdData.productName || 'N/A'}\n\n## Project Context\n\n**Type:** ${prdData.projectContext?.productType || 'N/A'}\n**Value:** ${prdData.projectContext?.coreValueProposition || 'N/A'}\n\n### Tech Stack\n- **Frontend:** ${tech.frontend}\n- **Backend:** ${tech.backend}\n- **DB/Auth:** ${tech.databaseAuth}\n\n## Technical Setup\n\n### Supabase\n${setup.supabase?.readme}\n\n\`\`\`sql\n${setup.supabase?.schemaSql}\n\`\`\`\n\n### n8n\n${setup.n8n?.readme}\n\n${n8nLogic.map(s => `**Step ${s.step}: ${s.node}**\n> ${s.details}`).join('\n\n')}\n\n### Frontend\n${setup.frontend?.readme}\n\n\`\`\`\n${feVars.join('\n')}\n\`\`\``;
-        }
+        const formatPrdAsMarkdown = (prdData) => { if (!prdData) return ''; const tech = prdData.projectContext?.techStack || {}; const setup = prdData.technicalSetup || {}; const n8nLogic = setup.n8n?.workflowLogic || []; const feVars = setup.frontend?.environmentVariables || []; return `# ${prdData.productName || 'N/A'}\n\n## Project Context\n\n**Type:** ${prdData.projectContext?.productType || 'N/A'}\n**Value:** ${prdData.projectContext?.coreValueProposition || 'N/A'}\n\n### Tech Stack\n- **Frontend:** ${tech.frontend}\n- **Backend:** ${tech.backend}\n- **DB/Auth:** ${tech.databaseAuth}\n\n## Technical Setup\n\n### Supabase\n${setup.supabase?.readme}\n\n\`\`\`sql\n${setup.supabase?.schemaSql}\n\`\`\`\n\n### n8n\n${setup.n8n?.readme}\n\n${n8nLogic.map(s => `**Step ${s.step}: ${s.node}**\n> ${s.details}`).join('\n\n')}\n\n### Frontend\n${setup.frontend?.readme}\n\n\`\`\`\n${feVars.join('\n')}\n\`\`\``; };
 
         // --- HISTORY MANAGEMENT ---
-        function getHistory() { return isLocalStorageAvailable ? JSON.parse(localStorage.getItem('prdHistory') || '[]') : []; }
-        function saveToHistory(prdData) {
-            if (!isLocalStorageAvailable) return;
-            let history = getHistory();
-            const newEntry = { id: Date.now(), name: prdData.productName, date: new Date().toISOString(), data: prdData };
-            history.unshift(newEntry);
-            if (history.length > 20) history.pop();
-            localStorage.setItem('prdHistory', JSON.stringify(history));
-            renderHistoryList();
-        }
-        function renderHistoryList() {
-            if (!isLocalStorageAvailable) return;
-            const history = getHistory();
-            historyList.innerHTML = history.length === 0 ? '<li class="p-4 text-center text-gray-500">No history yet.</li>' :
-                history.map(entry => `<li data-id="${entry.id}" class="p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"><span class="font-semibold block">${entry.name}</span><span class="text-sm text-gray-500">${new Date(entry.date).toLocaleString()}</span></li>`).join('');
-        }
-        function displayFromHistory(id) {
-            const entry = getHistory().find(item => item.id == id);
-            if (entry) {
-                displayResult(entry.data);
-                resultModal.classList.add('flex');
-            }
-        }
-
+        const getHistory = () => isLocalStorageAvailable ? JSON.parse(localStorage.getItem('prdHistory') || '[]') : [];
+        const saveToHistory = (prdData) => { if (!isLocalStorageAvailable) return; let history = getHistory(); const newEntry = { id: Date.now(), name: prdData.productName, date: new Date().toISOString(), data: prdData }; history.unshift(newEntry); if (history.length > 20) history.pop(); localStorage.setItem('prdHistory', JSON.stringify(history)); renderHistoryList(); };
+        const renderHistoryList = () => { if (!isLocalStorageAvailable) return; const history = getHistory(); elements.historyList.innerHTML = history.length === 0 ? '<li class="p-4 text-center text-gray-500">No history yet.</li>' : history.map(entry => `<li data-id="${entry.id}" class="p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"><span class="font-semibold block">${entry.name}</span><span class="text-sm text-gray-500">${new Date(entry.date).toLocaleString()}</span></li>`).join(''); };
+        const displayFromHistory = (id) => { const entry = getHistory().find(item => item.id == id); if (entry) { displayResult(entry.data); elements.resultModal.classList.add('flex'); } };
+        
         // --- EVENT LISTENERS ---
-        ideaForm.addEventListener('submit', async (e) => {
+        elements.ideaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loadingModal.classList.add('flex');
+            elements.loadingModal.classList.add('flex');
             createSpaceAnimation();
 
             try {
@@ -274,72 +124,63 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chat: document.getElementById('idea-input').value, type: 'step01' })
                 });
-                if (!response.ok) throw new Error(`Webhook Error: ${response.status}`);
-                const data = await response.json();
-                const prdData = data[0]?.output; // Access the nested output
-                if (!prdData) throw new Error('Invalid data format received from server.');
-
+                if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+                const responseText = await response.text();
+                if (!responseText) throw new Error("The AI returned an empty response. Please try rephrasing your request.");
+                const data = JSON.parse(responseText);
+                const prdData = data[0]?.output;
+                if (!prdData) throw new Error('The AI response was not in the expected format.');
                 displayResult(prdData);
                 saveToHistory(prdData);
-                resultModal.classList.add('flex');
-
+                elements.resultModal.classList.add('flex');
             } catch (error) {
                 alert(`An error occurred: ${error.message}`);
             } finally {
-                loadingModal.classList.remove('flex');
+                elements.loadingModal.classList.remove('flex');
             }
         });
 
-        // Copy buttons
-        copyMarkdownBtn.addEventListener('click', () => {
+        // Action Buttons
+        elements.downloadMdBtn.addEventListener('click', () => {
             if (!currentPrdData) return;
-            const markdown = formatPrdAsMarkdown(currentPrdData);
-            navigator.clipboard.writeText(markdown).then(() => alert('Markdown copied to clipboard!'));
+            const markdownContent = formatPrdAsMarkdown(currentPrdData);
+            const safeFilename = (currentPrdData.productName || 'PRD_Document').replace(/[^a-z0-9_]/gi, '_');
+            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeFilename}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         });
-        copyJsonBtn.addEventListener('click', () => {
-            if (!currentPrdData) return;
-            navigator.clipboard.writeText(JSON.stringify(currentPrdData, null, 2)).then(() => alert('JSON copied to clipboard!'));
-        });
-
+        elements.copyMarkdownBtn.addEventListener('click', () => { if (currentPrdData) navigator.clipboard.writeText(formatPrdAsMarkdown(currentPrdData)).then(() => alert('Markdown copied!')); });
+        elements.copyJsonBtn.addEventListener('click', () => { if (currentPrdData) navigator.clipboard.writeText(JSON.stringify(currentPrdData, null, 2)).then(() => alert('JSON copied!')); });
+        
         // Modal and Panel Controls
-        closeResultModalBtn.addEventListener('click', () => resultModal.classList.remove('flex'));
-        changelogBtn.addEventListener('click', () => changelogModal.classList.add('flex'));
-        closeChangelogModalBtn.addEventListener('click', () => changelogModal.classList.remove('flex'));
-        historyBtn.addEventListener('click', () => historyPanel.style.right = '0');
-        closeHistoryBtn.addEventListener('click', () => historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%');
-        historyList.addEventListener('click', (e) => {
-            const li = e.target.closest('li');
-            if (li && li.dataset.id) {
-                displayFromHistory(li.dataset.id);
-                historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%';
-            }
-        });
-        window.addEventListener('click', (e) => {
-            if (e.target === resultModal) resultModal.classList.remove('flex');
-            if (e.target === changelogModal) changelogModal.classList.remove('flex');
-        });
+        elements.closeResultModalBtn.addEventListener('click', () => elements.resultModal.classList.remove('flex'));
+        elements.changelogBtn.addEventListener('click', () => elements.changelogModal.classList.add('flex'));
+        elements.closeChangelogModalBtn.addEventListener('click', () => elements.changelogModal.classList.remove('flex'));
+        elements.historyBtn.addEventListener('click', () => elements.historyPanel.style.right = '0');
+        elements.closeHistoryBtn.addEventListener('click', () => elements.historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%');
+        elements.historyList.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li?.dataset.id) { displayFromHistory(li.dataset.id); elements.historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%'; } });
+        window.addEventListener('click', (e) => { if (e.target === elements.resultModal) elements.resultModal.classList.remove('flex'); if (e.target === elements.changelogModal) elements.changelogModal.classList.remove('flex'); });
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Check LocalStorage availability
             try {
                 localStorage.setItem('theme_test', 'test');
                 localStorage.removeItem('theme_test');
                 isLocalStorageAvailable = true;
             } catch (e) {
                 isLocalStorageAvailable = false;
-                historyBtn.style.display = 'none'; // Hide history if not available
+                elements.historyBtn.style.display = 'none';
             }
-
-            // Apply saved theme or default to system preference
-            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            applyTheme(savedTheme);
-
-            if (isLocalStorageAvailable) {
-                renderHistoryList();
-            }
+            const savedTheme = isLocalStorageAvailable ? localStorage.getItem('theme') : 'dark';
+            applyTheme(savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+            if (isLocalStorageAvailable) renderHistoryList();
         });
-
     </script>
 </body>
 </html>
