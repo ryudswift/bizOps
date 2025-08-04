@@ -10,7 +10,7 @@
         - Added: A subtle, glowing border effect on card hover to enhance the 3D feel.
         - Improved: Card animation and transitions for a smoother user experience.
     -->
-    <title>SwiftSheets Index v0.03</title>
+    <title>BizOps</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -183,8 +183,8 @@
     <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-6xl">
         <!-- Header -->
         <header class="text-center mb-12 pt-8 sm:pt-16">
-            <h1 class="text-4xl md:text-6xl font-bold">SwiftSheets</h1>
-            <p class="text-lg mt-2 text-muted">An automated index of guides, tools, and notes.</p>
+            <h1 class="text-4xl md:text-6xl font-bold">Business Operations</h1>
+            <p class="text-lg mt-2 text-muted">Guides on business processes</p>
             <div class="mt-8">
                 <button id="sync-button" class="sync-button font-bold text-lg">
                     Sync Sheets
@@ -217,8 +217,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const GITHUB_REPO = 'ryudswift/swiftsheets';
-            const PAGES_DIR_API = `https://api.github.com/repos/${GITHUB_REPO}/contents/pages`;
+            const GITHUB_REPO = 'ryudswift/bizOps';
+            const PAGES_DIR_API = `https://api.github.com/repos/${GITHUB_REPO}/contents/guides`;
 
             const grid = document.getElementById('pages-grid');
             const syncButton = document.getElementById('sync-button');
@@ -245,7 +245,7 @@
             function createPageCard(page) {
                 const title = formatTitle(page.name);
                 const description = createDescription(title);
-                const pageUrl = `https://ryudswift.github.io/swiftsheets/pages/${page.name}`;
+                const pageUrl = `https://ryudswift.github.io/bizOps/guides/${page.name}`;
                 const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-dark').substring(1).trim();
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--highlight-primary').substring(1).trim();
                 const imageUrl = `https://placehold.co/600x400/${bgColor}/${textColor}?text=${encodeURIComponent(title.split(':')[0] || title)}&font=ubuntu`;
@@ -339,7 +339,7 @@
 
             function setTheme(themeName) {
                 document.documentElement.className = themeName;
-                localStorage.setItem('swiftsheets-theme', themeName);
+                localStorage.setItem('bizOps-theme', themeName);
                 currentThemeIndex = themes.indexOf(themeName);
                 loadParticles(themeName);
                 
@@ -355,7 +355,7 @@
             });
 
             // --- Initial Load ---
-            const savedTheme = localStorage.getItem('swiftsheets-theme') || 'theme-ubuntu';
+            const savedTheme = localStorage.getItem('bizOps-theme') || 'theme-ubuntu';
             setTheme(savedTheme.split(' ')[0]);
         });
     </script>
