@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Catalyst AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 6px;
+            transition: width 0.5s ease;
+        }
+        .content-card {
+            transition: all 0.3s ease;
+        }
+        .content-card:hover {
+            transform: scale(1.02);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-bolt text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Content Catalyst AI</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:underline">Dashboard</a></li>
+                        <li><a href="#" class="hover:underline">Projects</a></li>
+                        <li><a href="#" class="hover:underline">Templates</a></li>
+                        <li><a href="#" class="hover:underline">Settings</a></li>
+                    </ul>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-white text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-50 transition">
+                        <i class="fas fa-user mr-2"></i>Sign In
+                    </button>
+                    <button class="md:hidden text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="mb-12">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Transform Your Ideas Into Engaging Content</h2>
+                <p class="text-xl text-gray-600 mb-8">Our AI-powered platform helps you go from initial concept to multi-platform content in just four simple steps.</p>
+                <button id="startProjectBtn" class="gradient-bg text-white px-8 py-3 rounded-lg font-bold text-lg hover:opacity-90 transition shadow-lg">
+                    Start New Project <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Project Creation Modal -->
+        <div id="projectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">Start New Project</h3>
+                    <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="projectName" class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                        <input type="text" id="projectName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label for="initialIdea" class="block text-sm font-medium text-gray-700 mb-1">Your Initial Idea</label>
+                        <textarea id="initialIdea" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Describe your content idea or topic..."></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="industry" class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                            <select id="industry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                                <option value="">Select industry</option>
+                                <option value="technology">Technology</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="finance">Finance</option>
+                                <option value="education">Education</option>
+                                <option value="retail">Retail</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">Brand/Company</label>
+                            <input type="text" id="brand" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Your brand or company name">
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <button id="createProjectBtn" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium w-full hover:opacity-90 transition">
+                            Create Project <i class="fas fa-plus ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Progress Section -->
+        <section id="projectProgress" class="hidden mb-12">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Project Progress</h3>
+                
+                <div class="mb-8">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Step 1 of 4 completed</span>
+                        <span class="text-sm font-medium text-purple-600">25%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="progress-bar bg-purple-600 rounded-full" style="width: 25%"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Step 1 -->
+                    <div class="step-card bg-white border border-purple-200 rounded-lg p-5 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Context Enrichment</h4>
+                        <p class="text-sm text-gray-600 mb-4">We analyze your initial idea to understand broader themes and relevance.</p>
+                        <div class="flex items-center text-sm text-purple-600">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <span>Completed</span>
+                        </div>
+                        <button class="mt-4 text-sm text-purple-600 hover:underline flex items-center">
+                            View Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card bg-white border border-gray-200 rounded-lg p-5 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-gray-300 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Strategy Development</h4>
+                        <p class="text-sm text-gray-600 mb-4">We create a tailored content strategy based on your industry and brand.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-spinner mr-2 animate-spin"></i>
+                            <span>Pending</span>
+                        </div>
+                        <button class="mt-4 text-sm text-gray-500 cursor-not-allowed" disabled>
+                            View Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card bg-white border border-gray-200 rounded-lg p-5 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-gray-300 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Campaign Ideation</h4>
+                        <p class="text-sm text-gray-600 mb-4">We generate evergreen campaign ideas aligned with your strategy.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-lock mr-2"></i>
+                            <span>Locked</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card bg-white border border-gray-200 rounded-lg p-5 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-gray-300 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <span class="font-bold">4</span>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Content Generation</h4>
+                        <p class="text-sm text-gray-600 mb-4">We create platform-specific content ready for publishing.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-lock mr-2"></i>
+                            <span>Locked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 1 Results -->
+        <section id="step1Results" class="hidden mb-12 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Context Enrichment Results</h3>
+                    <button id="proceedToStep2Btn" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                        Proceed to Strategy <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lightbulb text-purple-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-purple-800">Your Initial Idea</h4>
+                            <div class="mt-1 text-sm text-purple-700">
+                                <p id="initialIdeaDisplay">Creating a guide for remote team collaboration tools</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-brain text-blue-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-blue-800">AI-Generated Context</h4>
+                            <div class="mt-1 text-sm text-blue-700">
+                                <p id="enrichedContextDisplay">Remote work has become increasingly prevalent, with tools like Slack, Zoom, and Asana dominating the market. However, many teams struggle with tool overload and integration challenges. A comprehensive guide could cover: 1) Comparison of top tools, 2) Best practices for implementation, 3) Security considerations, 4) Cost-benefit analysis, and 5) Case studies of successful remote teams. This content would appeal to HR professionals, team leaders, and small business owners navigating the remote work landscape.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2 Input -->
+        <section id="step2Input" class="hidden mb-12 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Strategy Development</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Your Input</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                <div class="px-4 py-2 bg-white border border-gray-300 rounded-lg">Technology</div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Brand/Company</label>
+                                <div class="px-4 py-2 bg-white border border-gray-300 rounded-lg">WorkSync</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Additional Details</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="targetAudience" class="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+                                <input type="text" id="targetAudience" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="e.g., HR managers, team leads">
+                            </div>
+                            <div>
+                                <label for="contentTone" class="block text-sm font-medium text-gray-700 mb-1">Preferred Tone</label>
+                                <select id="contentTone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                                    <option value="professional">Professional</option>
+                                    <option value="conversational">Conversational</option>
+                                    <option value="authoritative">Authoritative</option>
+                                    <option value="friendly">Friendly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="generateStrategyBtn" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    Generate Content Strategy <i class="fas fa-magic ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Generated Content Section -->
+        <section id="generatedContent" class="hidden mb-12 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Generated Content</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Blog Content -->
+                    <div class="content-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md">
+                        <div class="bg-blue-100 p-4 flex items-center">
+                            <i class="fas fa-blog text-blue-600 text-xl mr-3"></i>
+                            <h4 class="font-semibold text-gray-800">Blog Post</h4>
+                        </div>
+                        <div class="p-4">
+                            <h5 class="font-medium text-gray-800 mb-2">The Ultimate Guide to Remote Team Collaboration Tools</h5>
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">In today's digital age, remote work is no longer a luxury but a necessity. This comprehensive guide explores the top collaboration tools that can help your team stay productive and connected, regardless of location...</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Ready</span>
+                                <button class="text-blue-600 text-sm hover:underline">View Full Content</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- LinkedIn Post -->
+                    <div class="content-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md">
+                        <div class="bg-blue-500 p-4 flex items-center">
+                            <i class="fab fa-linkedin text-white text-xl mr-3"></i>
+                            <h4 class="font-semibold text-white">LinkedIn Post</h4>
+                        </div>
+                        <div class="p-4">
+                            <h5 class="font-medium text-gray-800 mb-2">5 Signs Your Team Needs Better Collaboration Tools</h5>
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">Are endless email threads and missed deadlines becoming the norm? Your team might be suffering from tool fragmentation. Here are 5 telltale signs it's time to upgrade your collaboration stack...</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Ready</span>
+                                <button class="text-blue-600 text-sm hover:underline">View Full Content</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instagram Post -->
+                    <div class="content-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md">
+                        <div class="bg-pink-500 p-4 flex items-center">
+                            <i class="fab fa-instagram text-white text-xl mr-3"></i>
+                            <h4 class="font-semibold text-white">Instagram</h4>
+                        </div>
+                        <div class="p-4">
+                            <div class="bg-gray-100 h-40 mb-3 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-2xl"></i>
+                            </div>
+                            <h5 class="font-medium text-gray-800 mb-2">Tool Comparison Cheat Sheet</h5>
+                            <p class="text-xs text-gray-600 mb-2">Swipe left for our comparison of top remote work tools!</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Image Prompt Ready</span>
+                                <button class="text-blue-600 text-sm hover:underline">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button class="bg-gray-800 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-700 transition">
+                        Download All Assets <i class="fas fa-download ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800">How Content Catalyst AI Works</h2>
+                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Our four-step process transforms your raw ideas into polished, platform-ready content</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-purple-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">1. Context Enrichment</h3>
+                    <p class="text-gray-600">We analyze your initial idea to understand broader themes, audience needs, and industry relevance.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-chess text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">2. Strategy Development</h3>
+                    <p class="text-gray-600">We create a tailored content strategy based on your brand, industry, and target audience.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-green-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-lightbulb text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">3. Campaign Ideation</h3>
+                    <p class="text-gray-600">We generate evergreen campaign ideas that align with your strategy and resonate with your audience.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-rocket text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">4. Content Generation</h3>
+                    <p class="text-gray-600">We create platform-specific content ready for publishing across blogs, social media, and more.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-bolt mr-2"></i> Content Catalyst AI
+                    </h3>
+                    <p class="text-gray-400">Transforming ideas into engaging content with AI-powered workflows.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Webinars</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">API Docs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Legal</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 Content Catalyst AI. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const startProjectBtn = document.getElementById('startProjectBtn');
+        const projectModal = document.getElementById('projectModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const createProjectBtn = document.getElementById('createProjectBtn');
+        const projectProgress = document.getElementById('projectProgress');
+        const step1Results = document.getElementById('step1Results');
+        const proceedToStep2Btn = document.getElementById('proceedToStep2Btn');
+        const step2Input = document.getElementById('step2Input');
+        const generateStrategyBtn = document.getElementById('generateStrategyBtn');
+        const generatedContent = document.getElementById('generatedContent');
+        
+        // Event Listeners
+        startProjectBtn.addEventListener('click', () => {
+            projectModal.classList.remove('hidden');
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            projectModal.classList.add('hidden');
+        });
+        
+        createProjectBtn.addEventListener('click', () => {
+            const projectName = document.getElementById('projectName').value;
+            const initialIdea = document.getElementById('initialIdea').value;
+            const industry = document.getElementById('industry').value;
+            const brand = document.getElementById('brand').value;
+            
+            if (!initialIdea || !industry || !brand) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // In a real app, this would call an API to create the project
+            console.log('Creating project:', { projectName, initialIdea, industry, brand });
+            
+            // Close modal and show progress
+            projectModal.classList.add('hidden');
+            projectProgress.classList.remove('hidden');
+            
+            // Simulate AI processing delay
+            setTimeout(() => {
+                document.getElementById('initialIdeaDisplay').textContent = initialIdea;
+                step1Results.classList.remove('hidden');
+            }, 1500);
+        });
+        
+        proceedToStep2Btn.addEventListener('click', () => {
+            step1Results.classList.add('hidden');
+            step2Input.classList.remove('hidden');
+            
+            // Update progress bar
+            document.querySelector('.progress-bar').style.width = '50%';
+            document.querySelector('.progress-bar').classList.remove('bg-purple-600');
+            document.querySelector('.progress-bar').classList.add('bg-blue-600');
+            
+            // Update status text
+            document.querySelector('.text-purple-600').textContent = '50%';
+        });
+        
+        generateStrategyBtn.addEventListener('click', () => {
+            // Simulate AI processing
+            step2Input.classList.add('hidden');
+            
+            setTimeout(() => {
+                // Update progress bar
+                document.querySelector('.progress-bar').style.width = '100%';
+                document.querySelector('.progress-bar').classList.remove('bg-blue-600');
+                document.querySelector('.progress-bar').classList.add('bg-green-600');
+                
+                // Update status text
+                document.querySelector('.text-purple-600').textContent = '100%';
+                
+                // Show generated content
+                generatedContent.classList.remove('hidden');
+            }, 2000);
+        });
+        
+        // Close modal when clicking outside
+        projectModal.addEventListener('click', (e) => {
+            if (e.target === projectModal) {
+                projectModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
