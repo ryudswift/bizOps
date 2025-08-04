@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudoDev AI Automation Funnel Launch Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .task-checkbox {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.25em;
+            height: 1.25em;
+            border: 0.15em solid currentColor;
+            border-radius: 0.5em;
+            transform: translateY(-0.075em);
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .task-checkbox::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #4f46e5;
+            transform-origin: bottom left;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .task-checkbox:checked::before {
+            transform: scale(1);
+        }
+        .task-checkbox:checked {
+            background-color: #c7d2fe;
+            border-color: #4f46e5;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 1.5rem;
+        }
+        .accordion-item.active .accordion-content {
+            padding: 1rem 1.5rem 1.5rem;
+            max-height: 1000px; /* Adjust as needed for content */
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-item.active .accordion-icon {
+            transform: rotate(90deg);
+        }
+        /* Modal styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .gemini-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .gemini-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+        }
+        .spinner {
+            border-top-color: #4f46e5;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-600">AI Automation Funnel Launch Plan</h1>
+            <p class="text-slate-500 mt-2">Your interactive checklist for building the SudoDev empire.</p>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="mb-8 p-6 bg-white rounded-2xl shadow-lg">
+            <h2 class="text-lg font-semibold mb-3">Overall Progress</h2>
+            <div class="w-full bg-slate-200 rounded-full h-4">
+                <div id="progress-bar" class="bg-indigo-500 h-4 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+            </div>
+            <p id="progress-text" class="text-center text-sm font-medium text-indigo-600 mt-2">0% Complete</p>
+        </div>
+
+        <main id="task-list" class="space-y-4">
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center p-8">
+                <p class="text-slate-500">Loading your progress...</p>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12">
+            <p class="text-sm text-slate-400">Powered by SudoDev & Gemini</p>
+        </footer>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-indigo-600">✨ AI Assistant</h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="gemini-output" class="prose prose-slate max-w-none h-96 overflow-y-auto bg-slate-50 p-4 rounded-lg">
+                <!-- AI content will be injected here -->
+            </div>
+            <div class="mt-6 flex justify-end">
+                 <button id="copy-to-clipboard-btn" class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors gemini-button">
+                    Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- DATA STRUCTURE ---
+        const projectPlan = {
+            phases: [
+                {
+                    title: "Part 1: Foundational Brand & Content Setup",
+                    weeks: "Weeks 1-2",
+                    tasks: [
+                        { id: "task_1_1", title: "Finalize Brand Identity", actions: [
+                            { id: "action_1_1_1", text: "Finalize your handle (e.g., SudoDev)." },
+                            { id: "action_1_1_2", text: "Create a clean logo/profile picture." },
+                            { id: "action_1_1_3", text: "Define your hook/one-liner for bios." },
+                        ]},
+                        { id: "task_1_2", title: "Set Up Content Platforms", actions: [
+                            { id: "action_1_2_1", text: "Secure handle & set up primary platform (e.g., Instagram)." },
+                            { id: "action_1_2_2", text: "Write compelling bio with hook and link-in-bio." },
+                            { id: "action_1_2_3", text: "Create and brand secondary platform (e.g., YouTube)." },
+                        ]},
+                        { id: "task_1_3", title: "Develop Core Content Pillars & Idea Bank", actions: [
+                            { id: "action_1_3_1", text: "Set up an idea database in Notion." },
+                            { id: "action_1_3_2", text: "Flesh out 5 core content pillars (Lead Aggregation, Enrichment, etc.)." },
+                            { id: "action_1_3_3", text: "Populate the database with at least 10 initial video ideas.", gemini: "ideas" },
+                        ]},
+                        { id: "task_1_4", title: "Design Content Creation Automation Workflow", actions: [
+                            { id: "action_1_4_1", text: "Build n8n workflow for idea ingestion & script templating." },
+                            { id: "action_1_4_2", text: "Develop workflow for post-production (transcription, captioning)." },
+                        ]}
+                    ]
+                },
+                {
+                    title: "Part 2: Lead Generation Engine Setup",
+                    weeks: "Weeks 2-3",
+                    tasks: [
+                        { id: "task_2_1", title: "Define and Build the High-Value Lead Magnet", actions: [
+                            { id: "action_2_1_1", text: "Build the 'LinkedIn Profile Scraper & Enricher' n8n workflow." },
+                            { id: "action_2_1_2", text: "Add annotations within the n8n workflow for clarity." },
+                            { id: "action_2_1_3", text: "Create a 'Quick Start' PDF guide or short video." },
+                        ]},
+                        { id: "task_2_2", title: "Build and Deploy the Landing Page", actions: [
+                            { id: "action_2_2_1", text: "Choose platform and build the landing page (e.g., Carrd)." },
+                            { id: "action_2_2_2", text: "Write compelling copy (Headline, Bullets, CTA)." },
+                            { id: "action_2_2_3", text: "Embed the email capture form." },
+                        ]},
+                        { id: "task_2_3", title: "Set Up Email Backend & Delivery Automation", actions: [
+                            { id: "action_2_3_1", text: "Set up email marketing tool (e.g., Listmonk)." },
+                            { id: "action_2_3_2", text: "Create the automated welcome email sequence." },
+                            { id: "action_2_3_3", text: "Test the full signup flow from landing page to email delivery." },
+                        ]}
+                    ]
+                }
+            ]
+        };
+
+        // --- UI RENDERING ---
+        const taskListContainer = document.getElementById('task-list');
+        const loadingState = document.getElementById('loading-state');
+
+        function renderPlan() {
+            let html = '';
+            projectPlan.phases.forEach((phase) => {
+                html += `
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <h2 class="text-xl sm:text-2xl font-bold">${phase.title}</h2>
+                            <p class="text-sm text-slate-500 font-medium">${phase.weeks}</p>
+                        </div>
+                        <div class="border-t border-slate-100">
+                            ${phase.tasks.map(task => `
+                                <div class="accordion-item border-b border-slate-100 last:border-b-0" id="${task.id}">
+                                    <button class="accordion-header w-full flex justify-between items-center text-left p-6 hover:bg-slate-50 focus:outline-none">
+                                        <span class="text-base sm:text-lg font-semibold text-slate-700">${task.title}</span>
+                                        <div class="flex items-center space-x-4">
+                                            <button class="gemini-post-btn p-2 rounded-full hover:bg-indigo-100 transition-colors" data-task-title="${task.title}" title="Draft announcement post">
+                                                <svg class="w-5 h-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C11.4477 2 11 2.44772 11 3V5.05199C8.33186 5.54319 6.5 7.99941 6.5 10.8333V15.5L4 18V19H20V18L17.5 15.5V10.8333C17.5 7.99941 15.6681 5.54319 13 5.05199V3C13 2.44772 12.5523 2 12 2ZM12 22C13.1046 22 14 21.1046 14 20H10C10 21.1046 10.8954 22 12 22Z"></path></svg>
+                                            </button>
+                                            <svg class="accordion-icon w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </div>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="space-y-4">
+                                            ${task.actions.map(action => `
+                                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 transition-colors duration-200">
+                                                    <label for="${action.id}" class="flex items-start cursor-pointer flex-grow">
+                                                        <input type="checkbox" id="${action.id}" class="task-checkbox mt-1 flex-shrink-0">
+                                                        <span class="ml-4 text-slate-600">${action.text}</span>
+                                                    </label>
+                                                    ${action.gemini === 'ideas' ? `<button class="gemini-ideas-btn bg-indigo-100 text-indigo-700 text-sm font-semibold py-1 px-3 rounded-full hover:bg-indigo-200 transition-colors gemini-button">Generate Ideas ✨</button>` : ''}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            taskListContainer.innerHTML = html;
+            loadingState.style.display = 'none';
+        }
+
+        // --- GEMINI API & MODAL LOGIC ---
+        const geminiModal = document.getElementById('gemini-modal');
+        const geminiOutput = document.getElementById('gemini-output');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const copyToClipboardBtn = document.getElementById('copy-to-clipboard-btn');
+
+        function showModal() {
+            geminiModal.classList.remove('pointer-events-none', 'opacity-0');
+            geminiModal.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+        }
+
+        function hideModal() {
+            geminiModal.classList.add('pointer-events-none', 'opacity-0');
+            geminiModal.querySelector('.modal-content').classList.add('scale-95', 'opacity-0');
+        }
+
+        closeModalBtn.addEventListener('click', hideModal);
+        copyToClipboardBtn.addEventListener('click', () => {
+            const textToCopy = geminiOutput.innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            copyToClipboardBtn.textContent = 'Copied!';
+            setTimeout(() => { copyToClipboardBtn.textContent = 'Copy to Clipboard'; }, 2000);
+        });
+
+        async function callGemini(prompt, maxRetries = 3) {
+            geminiOutput.innerHTML = '<div class="flex justify-center items-center h-full"><div class="spinner w-12 h-12 rounded-full border-4 border-slate-200"></div></div>';
+            showModal();
+
+            const apiKey = ""; // Canvas will provide the key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        // Basic markdown to HTML conversion
+                        let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                       .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                       .replace(/^(#{1,6})\s*(.*)/gm, (match, hashes, content) => `<h${hashes.length}>${content}</h${hashes.length}>`)
+                                       .replace(/\n/g, '<br>');
+                        geminiOutput.innerHTML = html;
+                        return; // Success, exit loop
+                    } else {
+                         throw new Error("Invalid response structure from Gemini API.");
+                    }
+                } catch (error) {
+                    console.error(`Gemini API call failed (attempt ${i + 1}):`, error);
+                    if (i === maxRetries - 1) {
+                        geminiOutput.innerHTML = `<p class="text-red-500">Sorry, the AI assistant is currently unavailable. Please try again later.</p><p class="text-xs text-slate-400 mt-2">${error.message}</p>`;
+                        return;
+                    }
+                    // Exponential backoff
+                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
+                }
+            }
+        }
+
+        // --- APPLICATION LOGIC ---
+        let db, auth;
+        let userId = null;
+        let docRef = null;
+        let allCheckboxes = [];
+
+        function updateProgress() {
+            const checkedCount = allCheckboxes.filter(cb => cb.checked).length;
+            const totalCount = allCheckboxes.length;
+            const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+            
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = `${percentage}% Complete`;
+        }
+        
+        async function saveProgress() {
+            if (!docRef) return;
+            const progress = {};
+            allCheckboxes.forEach(cb => { progress[cb.id] = cb.checked; });
+            try {
+                await setDoc(docRef, { progress });
+            } catch (error) {
+                console.error("Error saving progress: ", error);
+            }
+        }
+
+        function loadProgress(progressData) {
+            if (!progressData) return;
+            allCheckboxes.forEach(cb => {
+                if (progressData[cb.id]) cb.checked = true;
+            });
+            updateProgress();
+        }
+
+        function setupEventListeners() {
+            allCheckboxes = Array.from(document.querySelectorAll('.task-checkbox'));
+            allCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    updateProgress();
+                    saveProgress();
+                });
+            });
+
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    // Prevent accordion from toggling if a button inside is clicked
+                    if (e.target.closest('button')) return;
+                    header.closest('.accordion-item').classList.toggle('active');
+                });
+            });
+
+            // Gemini button listeners
+            document.querySelector('.gemini-ideas-btn')?.addEventListener('click', () => {
+                const prompt = `
+                    You are a viral marketing expert for an AI Automation consultant (SudoDev). 
+                    Generate 10 engaging, short-form video ideas (for Reels/Shorts) to attract solopreneurs and small business owners.
+                    The content pillars are: Lead Aggregation, Lead Enrichment, Outreach Automation, Meeting Prep, and general n8n/AI tips.
+                    Format the output as a numbered list with a catchy title for each idea.
+                `;
+                callGemini(prompt);
+            });
+
+            document.querySelectorAll('.gemini-post-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const taskTitle = btn.dataset.taskTitle;
+                    const prompt = `
+                        You are a social media manager for SudoDev, an AI Automation consultancy.
+                        Draft a short, exciting, and slightly technical social media post (for Instagram or Twitter) announcing progress on the business launch.
+                        The task just completed is: "${taskTitle}".
+                        Frame it as a "building in public" update. Make it sound like an expert sharing their journey.
+                        Include relevant hashtags like #AIautomation, #n8n, #BuildInPublic, #SudoDev.
+                    `;
+                    callGemini(prompt);
+                });
+            });
+        }
+
+        // --- FIREBASE INITIALIZATION ---
+        async function initialize() {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = typeof __firebase_config !== 'undefined' 
+                ? JSON.parse(__firebase_config) 
+                : { apiKey: "AIza...", authDomain: "...", projectId: "..." };
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        docRef = doc(db, "artifacts", appId, "public/data/project_tracker", userId);
+                        
+                        renderPlan();
+                        setupEventListeners();
+
+                        onSnapshot(docRef, (docSnap) => {
+                            if (docSnap.exists()) {
+                                loadProgress(docSnap.data().progress);
+                            } else {
+                                saveProgress(); 
+                            }
+                        }, (error) => {
+                            console.error("Error listening to document: ", error);
+                            loadProgress(null); 
+                        });
+                    } else {
+                        renderPlan();
+                        setupEventListeners();
+                        console.log("User is not signed in. Progress will not be saved.");
+                        loadingState.style.display = 'none';
+                    }
+                });
+                
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                renderPlan();
+                setupEventListeners();
+                loadingState.innerHTML = '<p class="text-red-500">Could not connect to database. Progress will not be saved.</p>';
+            }
+        }
+
+        // Start the application
+        initialize();
+
+    </script>
+</body>
+</html>
