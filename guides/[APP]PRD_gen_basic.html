@@ -1,428 +1,340 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" class="dark"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRD Agent Input</title>
+    <title>Idea to PRD Generator v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        // Set up TailwindCSS for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;600&display=swap');
-
-        :root {
-            --background-color: #0a0a0c;
-            --text-color: #e4e4e7;
-            --primary-color: #2563eb;
-            --secondary-color: #3f3f46;
-            --glass-bg: rgba(18, 18, 20, 0.7);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --header-color: #ffffff;
-            --sub-text-color: #a1a1aa;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 2rem;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            margin: 0 auto;
-        }
+        /* Custom scrollbar for a better look in dark/light themes */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        html.dark ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        html.dark ::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.4); }
+        html:not(.dark) ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+        html:not(.dark) ::-webkit-scrollbar-thumb:hover { background-color: rgba(0, 0, 0, 0.4); }
         
-        .top-actions {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
+        /* Glassmorphism effect */
+        .glass-modal {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+        html.dark .glass-modal {
+            background: rgba(30, 41, 59, 0.5); /* Darker glass for dark mode */
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        p {
-            color: var(--sub-text-color);
-            margin-bottom: 2.5rem;
+        html:not(.dark) .glass-modal {
+            background: rgba(255, 255, 255, 0.5); /* Lighter glass for light mode */
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
-        #prd-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        textarea {
-            background-color: #1a1a1c;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-color);
-            padding: 1rem;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            min-height: 150px;
-            resize: vertical;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-        }
-
-        .submit-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.875rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .submit-button:hover { background-color: #1d4ed8; }
-        
-        .action-button {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .action-button:hover { background-color: #52525b; }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 900px;
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
-        .modal-title {
-            color: var(--header-color);
-            font-weight: 600;
-            margin-right: auto;
-        }
-
-        .close-button {
-            color: #aaa;
-            background: none;
-            border: none;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #results-container {
-            overflow-y: auto;
-            padding: 0 2rem 2rem 2rem;
-        }
-
-        /* History Panel */
-        .history-panel {
-            position: fixed;
-            top: 0;
-            right: -350px; /* Start off-screen */
-            width: 320px;
-            height: 100%;
-            background-color: #111113;
-            border-left: 1px solid var(--border-color);
-            box-shadow: -10px 0 20px rgba(0,0,0,0.2);
-            transition: right 0.3s ease-in-out;
-            z-index: 1100;
-            display: flex;
-            flex-direction: column;
-        }
-        .history-panel.visible {
-            right: 0;
-        }
-        .history-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        #history-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-        }
-        #history-list li {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #history-list li:hover {
-            background-color: var(--secondary-color);
-        }
-        #history-list li .name {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-        #history-list li .date {
-            font-size: 0.8rem;
-            color: var(--sub-text-color);
-        }
-
-
-        /* Results Formatting */
-        #results h1, #results h2, #results h3 { color: var(--header-color); }
-        #results h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; }
-        #results h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
-        #results p, #results li { color: var(--sub-text-color); line-height: 1.6; }
-        #results pre {
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Source Code Pro', monospace;
-            font-size: 0.9rem;
-        }
+        /* Hide modals initially */
+        .modal { display: none; }
+        .modal.flex { display: flex; }
     </style>
 </head>
-<body>
-    <div class="top-actions">
-        <button id="history-btn" class="action-button">History</button>
-    </div>
+<body class="bg-white dark:bg-black text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
 
-    <div class="main-container">
-        <h1>PRD Agent</h1>
-        <p>Enter your core project idea below. The AI will generate a structured Product Requirements Document to get you started.</p>
-        <form id="prd-form">
-            <textarea id="idea-input" placeholder="e.g., A multi-step content generation app..." required></textarea>
-            <button type="submit" class="submit-button">Generate PRD</button>
-        </form>
-    </div>
-
-    <div id="prd-modal" class="modal">
-        <div class="modal-content">
-             <div class="modal-header">
-                <span id="modal-title" class="modal-title">Generated Document</span>
-                <button id="download-md-btn" class="action-button">Download .md</button>
-                <button id="close-modal" class="close-button">&times;</button>
+    <nav class="fixed top-0 left-0 right-0 p-4 bg-white/30 dark:bg-black/30 glass-modal z-40">
+        <div class="w-full max-w-6xl mx-auto flex justify-between items-center">
+            <span class="font-bold text-lg">PRD Generator v1.0</span>
+            <div class="flex items-center gap-4">
+                <button id="history-btn" class="hover:text-blue-500 transition-colors">History</button>
+                <button id="changelog-btn" class="hover:text-blue-500 transition-colors">Changelog</button>
+                <button id="theme-switcher" class="text-xl">
+                    <span class="dark-icon">☀️</span>
+                    <span class="light-icon">🌙</span>
+                </button>
             </div>
-            <div id="results-container">
-                <div id="results">
-                    </div>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen p-4 pt-24">
+        <h1 class="text-3xl md:text-5xl font-bold text-center mb-4 text-gray-900 dark:text-white">Idea to PRD Generator</h1>
+        <p class="text-center mb-8 text-gray-600 dark:text-gray-400">Enter your idea below and get a structured PRD instantly.</p>
+
+        <form id="idea-form" class="w-full">
+            <div class="mb-4">
+                <textarea id="idea-input" rows="6" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your app idea here..." required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02]">
+                Generate PRD
+            </button>
+        </form>
+    </main>
+
+    <div id="loading-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70">
+        <div class="glass-modal rounded-2xl p-6 w-11/12 max-w-md h-64 flex flex-col">
+            <h2 class="text-xl font-bold mb-4 text-center">Generating Your PRD...</h2>
+            <div id="animation-container" class="flex-grow"></div>
+        </div>
+    </div>
+
+    <div id="result-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4">
+        <div class="glass-modal rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
+            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <h2 id="result-title" class="text-2xl font-bold">Generated PRD Details</h2>
+                <button id="close-result-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="result-content" class="overflow-y-auto pr-2"></div>
+            <div class="mt-6 flex flex-col sm:flex-row sm:justify-end gap-2 flex-shrink-0">
+                <button id="copy-markdown-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Markdown</button>
+                <button id="copy-json-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Copy Raw JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="changelog-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-70 p-4">
+        <div class="glass-modal rounded-2xl p-6 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Changelog</h2>
+                <button id="close-changelog-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                <div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Version 1.0 <span class="text-sm font-normal text-gray-500 dark:text-gray-400">- Aug 4, 2025</span></h3>
+                    <ul class="list-disc pl-5 mt-1 space-y-1">
+                        <li>Complete UI overhaul using TailwindCSS for a modern aesthetic.</li>
+                        <li>Added Dark/Light theme switcher with preference saved to browser.</li>
+                        <li>Implemented a fixed navigation bar for key actions.</li>
+                        <li>Added this changelog modal.</li>
+                        <li>Re-integrated and restyled the History feature.</li>
+                        <li>Upgraded loading animation to an interactive canvas-based animation.</li>
+                        <li>Enhanced result display for better readability.</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Pre-release Versions</h3>
+                    <ul class="list-disc pl-5 mt-1 space-y-1">
+                        <li>Added `localStorage` support for history, with graceful degradation.</li>
+                        <li>Added a 'Download .md' feature.</li>
+                        <li>Developed the core webhook integration and PRD generation logic.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
     
-    <div id="history-panel" class="history-panel">
-        <div class="history-header">
-            <h3>History</h3>
-            <button id="close-history" class="close-button">&times;</button>
+    <div id="history-panel" class="fixed top-0 right-[-100%] sm:right-[-400px] w-full sm:w-96 h-full bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 z-50 flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg">Generation History</h3>
+            <button id="close-history" class="text-2xl">&times;</button>
         </div>
-        <ul id="history-list">
-            </ul>
+        <ul id="history-list" class="overflow-y-auto"></ul>
     </div>
 
+
     <script>
+        const WEBHOOK_URL = 'https://n8n.sudev.site/webhook/871dd35d-6cb7-4ded-abc1-2e044648998e';
+
         // DOM Elements
-        const form = document.getElementById('prd-form');
-        const ideaInput = document.getElementById('idea-input');
-        const modal = document.getElementById('prd-modal');
-        const closeModal = document.getElementById('close-modal');
-        const downloadBtn = document.getElementById('download-md-btn');
-        const modalTitle = document.getElementById('modal-title');
-        const resultsDiv = document.getElementById('results');
+        const ideaForm = document.getElementById('idea-form');
+        const loadingModal = document.getElementById('loading-modal');
+        const resultModal = document.getElementById('result-modal');
+        const resultContent = document.getElementById('result-content');
+        const resultTitle = document.getElementById('result-title');
+        const closeResultModalBtn = document.getElementById('close-result-modal');
+        const copyMarkdownBtn = document.getElementById('copy-markdown-btn');
+        const copyJsonBtn = document.getElementById('copy-json-btn');
+        const animationContainer = document.getElementById('animation-container');
+        const themeSwitcher = document.getElementById('theme-switcher');
         const historyBtn = document.getElementById('history-btn');
         const historyPanel = document.getElementById('history-panel');
         const closeHistoryBtn = document.getElementById('close-history');
         const historyList = document.getElementById('history-list');
-
-        const webhookUrl = 'https://n8n.sudev.site/webhook/871dd35d-6cb7-4ded-abc1-2e044648998e';
-        let currentMarkdownContent = '';
+        const changelogBtn = document.getElementById('changelog-btn');
+        const changelogModal = document.getElementById('changelog-modal');
+        const closeChangelogModalBtn = document.getElementById('close-changelog-modal');
+        
+        let currentPrdData = null; // Store the latest full PRD data object
         let isLocalStorageAvailable = false;
 
-        // --- CHECK FOR LOCALSTORAGE AVAILABILITY ---
-        try {
-            localStorage.setItem('test', 'test');
-            localStorage.removeItem('test');
-            isLocalStorageAvailable = true;
-        } catch (e) {
-            isLocalStorageAvailable = false;
-            console.warn("LocalStorage is not available. History feature will be disabled.");
-            historyBtn.style.display = 'none';
+        // --- THEME SWITCHER LOGIC ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            themeSwitcher.querySelector('.dark-icon').style.display = theme === 'dark' ? 'block' : 'none';
+            themeSwitcher.querySelector('.light-icon').style.display = theme === 'light' ? 'block' : 'none';
         }
 
-        // --- RENDER & CONVERT FUNCTIONS ---
-        function renderPRD(prdData) {
-            // This function renders the HTML view in the modal
-            if (!prdData) return;
-            let html = `<h1>${prdData.productName}</h1>`;
-            const { supabase, n8n, frontend } = prdData.technicalSetup;
-            html += `<h2>Project Context</h2><p><strong>Product Type:</strong> ${prdData.projectContext.productType}</p><p><strong>Core Value:</strong> ${prdData.projectContext.coreValueProposition}</p>`;
-            html += `<h3>Tech Stack</h3><p><strong>Frontend:</strong> ${prdData.projectContext.techStack.frontend}</p><p><strong>Backend:</strong> ${prdData.projectContext.techStack.backend}</p><p><strong>Database & Auth:</strong> ${prdData.projectContext.techStack.databaseAuth}</p>`;
-            html += `<h2>Technical Setup</h2><h3>Supabase Setup</h3><p>${supabase.readme.replace(/\n/g, '<br>')}</p><h4>Database Schema (SQL)</h4><pre><code>${supabase.schemaSql}</code></pre>`;
-            html += `<h3>n8n Setup</h3><p>${n8n.readme.replace(/\n/g, '<br>')}</p><h4>Workflow Logic</h4>`;
-            n8n.workflowLogic.forEach(step => { html += `<div><p><strong>Step ${step.step}: ${step.node}</strong></p><p>${step.details}</p></div>`; });
-            html += `<h3>Frontend Setup</h3><p>${frontend.readme.replace(/\n/g, '<br>')}</p><h4>Environment Variables (.env.local)</h4><pre><code>${frontend.environmentVariables.join('\n')}</code></pre>`;
-            resultsDiv.innerHTML = html;
-            modalTitle.textContent = prdData.productName;
+        themeSwitcher.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        
+        // --- ANIMATION LOGIC ---
+        function createSpaceAnimation() {
+            // Complex canvas animation logic from the user's provided file
+            animationContainer.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = animationContainer.clientWidth;
+            canvas.height = animationContainer.clientHeight;
+            animationContainer.appendChild(canvas);
+            const stars = Array.from({ length: 150 }, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.5 + 0.1 }));
+            const orb = { x: canvas.width / 2, y: canvas.height / 2, radius: 20, pulseDirection: 1 };
+            
+            function animate() {
+                if (loadingModal.style.display !== 'flex') return; // Stop animation if modal is hidden
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                stars.forEach(s => {
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    s.y += s.speed;
+                    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+                });
+                const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
+                gradient.addColorStop(0, 'rgba(100, 100, 255, 1)');
+                gradient.addColorStop(1, 'rgba(100, 100, 255, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+                ctx.fill();
+                orb.radius += 0.2 * orb.pulseDirection;
+                if (orb.radius > 30 || orb.radius < 15) orb.pulseDirection *= -1;
+                requestAnimationFrame(animate);
+            }
+            animate();
         }
 
-        function convertToMarkdown(prdData) {
+        // --- DATA DISPLAY & FORMATTING ---
+        function displayResult(prdData) {
+            currentPrdData = prdData;
+            resultTitle.textContent = prdData.productName || 'Generated PRD';
+            
+            const renderList = (items) => items && items.length > 0 ? items.map(item => `<li class="mb-1"><code>${item}</code></li>`).join('') : '<li>N/A</li>';
+            const renderWorkflow = (steps) => steps && steps.length > 0 ? steps.map(step => `<div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 mt-2"><p class="font-medium">Step ${step.step}: ${step.node}</p><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">${step.details || 'N/A'}</p></div>`).join('') : '<p>N/A</p>';
+
+            resultContent.innerHTML = `
+                <div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Project Context</h3><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg space-y-3"><p><span class="font-semibold">Type:</span> ${prdData.projectContext?.productType || 'N/A'}</p><p><span class="font-semibold">Value:</span> ${prdData.projectContext?.coreValueProposition || 'N/A'}</p><div><h4 class="font-semibold mb-2">Tech Stack:</h4><ul class="list-disc pl-5"><li>Frontend: ${prdData.projectContext?.techStack?.frontend || 'N/A'}</li><li>Backend: ${prdData.projectContext?.techStack?.backend || 'N/A'}</li><li>DB/Auth: ${prdData.projectContext?.techStack?.databaseAuth || 'N/A'}</li></ul></div></div></div>
+                <div class="mb-6"><h3 class="text-xl font-bold mb-3 text-blue-500 dark:text-blue-400">Technical Setup</h3><div class="space-y-4">
+                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Supabase</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Schema SQL:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.supabase?.schemaSql || 'N/A'}</pre></div></div>
+                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">n8n</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.n8n?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Workflow Logic:</p><div>${renderWorkflow(prdData.technicalSetup?.n8n?.workflowLogic)}</div></div></div>
+                    <div><h4 class="font-semibold text-lg text-purple-500 dark:text-purple-400">Frontend</h4><div class="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg mt-2"><p class="mb-2 font-semibold">Readme:</p><pre class="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded">${prdData.technicalSetup?.frontend?.readme || 'N/A'}</pre><p class="mt-4 mb-2 font-semibold">Environment Variables:</p><ul class="list-disc pl-5">${renderList(prdData.technicalSetup?.frontend?.environmentVariables)}</ul></div></div>
+                </div></div>`;
+        }
+
+        function formatPrdAsMarkdown(prdData) {
             if (!prdData) return '';
-            const { productName, projectContext, technicalSetup } = prdData;
-            let md = `# ${productName}\n\n## Project Context\n\n`;
-            md += `**Product Type:** ${projectContext.productType}\n\n`;
-            md += `**Core Value Proposition:**\n${projectContext.coreValueProposition}\n\n`;
-            md += `### Tech Stack\n- **Frontend:** ${projectContext.techStack.frontend}\n- **Backend:** ${projectContext.techStack.backend}\n- **Database & Auth:** ${projectContext.techStack.databaseAuth}\n\n`;
-            md += `## Technical Setup\n\n`;
-            const { supabase, n8n, frontend } = technicalSetup;
-            md += `### Supabase Setup\n\n${supabase.readme}\n\n#### Database Schema (SQL)\n\`\`\`sql\n${supabase.schemaSql}\n\`\`\`\n\n`;
-            md += `### n8n Setup\n\n${n8n.readme}\n\n#### Workflow Logic\n\n`;
-            n8n.workflowLogic.forEach(step => { md += `**Step ${step.step}: ${step.node}**\n> ${step.details}\n\n`; });
-            md += `### Frontend Setup\n\n${frontend.readme}\n\n#### Environment Variables (.env.local)\n\`\`\`\n${frontend.environmentVariables.join('\n')}\n\`\`\`\n`;
-            return md;
+            const tech = prdData.projectContext?.techStack || {};
+            const setup = prdData.technicalSetup || {};
+            const n8nLogic = setup.n8n?.workflowLogic || [];
+            const feVars = setup.frontend?.environmentVariables || [];
+            return `# ${prdData.productName || 'N/A'}\n\n## Project Context\n\n**Type:** ${prdData.projectContext?.productType || 'N/A'}\n**Value:** ${prdData.projectContext?.coreValueProposition || 'N/A'}\n\n### Tech Stack\n- **Frontend:** ${tech.frontend}\n- **Backend:** ${tech.backend}\n- **DB/Auth:** ${tech.databaseAuth}\n\n## Technical Setup\n\n### Supabase\n${setup.supabase?.readme}\n\n\`\`\`sql\n${setup.supabase?.schemaSql}\n\`\`\`\n\n### n8n\n${setup.n8n?.readme}\n\n${n8nLogic.map(s => `**Step ${s.step}: ${s.node}**\n> ${s.details}`).join('\n\n')}\n\n### Frontend\n${setup.frontend?.readme}\n\n\`\`\`\n${feVars.join('\n')}\n\`\`\``;
         }
 
         // --- HISTORY MANAGEMENT ---
-        function getHistory() {
-            if (!isLocalStorageAvailable) return [];
-            return JSON.parse(localStorage.getItem('prdHistory') || '[]');
-        }
-
+        function getHistory() { return isLocalStorageAvailable ? JSON.parse(localStorage.getItem('prdHistory') || '[]') : []; }
         function saveToHistory(prdData) {
             if (!isLocalStorageAvailable) return;
             let history = getHistory();
-            const newEntry = {
-                id: Date.now(),
-                name: prdData.productName,
-                date: new Date().toISOString(),
-                data: prdData
-            };
+            const newEntry = { id: Date.now(), name: prdData.productName, date: new Date().toISOString(), data: prdData };
             history.unshift(newEntry);
-            if (history.length > 15) history.pop();
+            if (history.length > 20) history.pop();
             localStorage.setItem('prdHistory', JSON.stringify(history));
             renderHistoryList();
         }
-
         function renderHistoryList() {
             if (!isLocalStorageAvailable) return;
             const history = getHistory();
-            historyList.innerHTML = '';
-            if (history.length === 0) {
-                historyList.innerHTML = '<li>No history yet.</li>';
-                return;
-            }
-            history.forEach(entry => {
-                const li = document.createElement('li');
-                li.dataset.id = entry.id;
-                li.innerHTML = `<span class="name">${entry.name}</span><span class="date">${new Date(entry.date).toLocaleString()}</span>`;
-                li.addEventListener('click', () => {
-                    displayFromHistory(entry.id);
-                    historyPanel.classList.remove('visible');
-                });
-                historyList.appendChild(li);
-            });
+            historyList.innerHTML = history.length === 0 ? '<li class="p-4 text-center text-gray-500">No history yet.</li>' :
+                history.map(entry => `<li data-id="${entry.id}" class="p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"><span class="font-semibold block">${entry.name}</span><span class="text-sm text-gray-500">${new Date(entry.date).toLocaleString()}</span></li>`).join('');
         }
-        
         function displayFromHistory(id) {
-            const history = getHistory();
-            const entry = history.find(item => item.id == id);
+            const entry = getHistory().find(item => item.id == id);
             if (entry) {
-                renderPRD(entry.data);
-                currentMarkdownContent = convertToMarkdown(entry.data);
-                modal.style.display = 'flex';
+                displayResult(entry.data);
+                resultModal.classList.add('flex');
             }
         }
-        
+
         // --- EVENT LISTENERS ---
-        form.addEventListener('submit', async (e) => {
+        ideaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            resultsDiv.innerHTML = '<h2>Generating your document...</h2>';
-            modal.style.display = 'flex';
+            loadingModal.classList.add('flex');
+            createSpaceAnimation();
 
             try {
-                const response = await fetch(webhookUrl, {
+                const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ chat: ideaInput.value, type: 'step01' }),
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat: document.getElementById('idea-input').value, type: 'step01' })
                 });
                 if (!response.ok) throw new Error(`Webhook Error: ${response.status}`);
-                const responseData = await response.json();
-                const prdData = responseData[0]?.output;
-                
-                if (!prdData) throw new Error('Invalid data format from server.');
-                
-                renderPRD(prdData);
-                currentMarkdownContent = convertToMarkdown(prdData);
+                const data = await response.json();
+                const prdData = data[0]?.output; // Access the nested output
+                if (!prdData) throw new Error('Invalid data format received from server.');
+
+                displayResult(prdData);
                 saveToHistory(prdData);
+                resultModal.classList.add('flex');
 
             } catch (error) {
-                resultsDiv.innerHTML = `<h2 style="color: #f87171;">Error</h2><p>${error.message}</p>`;
+                alert(`An error occurred: ${error.message}`);
+            } finally {
+                loadingModal.classList.remove('flex');
             }
         });
 
-        downloadBtn.addEventListener('click', () => {
-            if (currentMarkdownContent) {
-                const a = document.createElement("a");
-                const file = new Blob([currentMarkdownContent], { type: 'text/markdown;charset=utf-8;' });
-                a.href = URL.createObjectURL(file);
-                a.download = 'download.md';
-                a.click();
-                URL.revokeObjectURL(a.href);
-            }
+        // Copy buttons
+        copyMarkdownBtn.addEventListener('click', () => {
+            if (!currentPrdData) return;
+            const markdown = formatPrdAsMarkdown(currentPrdData);
+            navigator.clipboard.writeText(markdown).then(() => alert('Markdown copied to clipboard!'));
+        });
+        copyJsonBtn.addEventListener('click', () => {
+            if (!currentPrdData) return;
+            navigator.clipboard.writeText(JSON.stringify(currentPrdData, null, 2)).then(() => alert('JSON copied to clipboard!'));
         });
 
         // Modal and Panel Controls
-        closeModal.onclick = () => { modal.style.display = 'none'; };
-        historyBtn.onclick = () => { historyPanel.classList.add('visible'); };
-        closeHistoryBtn.onclick = () => { historyPanel.classList.remove('visible'); };
-        window.onclick = (event) => {
-            if (event.target == modal) modal.style.display = 'none';
-        };
-        
-        // Initial Load
+        closeResultModalBtn.addEventListener('click', () => resultModal.classList.remove('flex'));
+        changelogBtn.addEventListener('click', () => changelogModal.classList.add('flex'));
+        closeChangelogModalBtn.addEventListener('click', () => changelogModal.classList.remove('flex'));
+        historyBtn.addEventListener('click', () => historyPanel.style.right = '0');
+        closeHistoryBtn.addEventListener('click', () => historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%');
+        historyList.addEventListener('click', (e) => {
+            const li = e.target.closest('li');
+            if (li && li.dataset.id) {
+                displayFromHistory(li.dataset.id);
+                historyPanel.style.right = window.innerWidth > 640 ? '-400px' : '-100%';
+            }
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === resultModal) resultModal.classList.remove('flex');
+            if (e.target === changelogModal) changelogModal.classList.remove('flex');
+        });
+
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Check LocalStorage availability
+            try {
+                localStorage.setItem('theme_test', 'test');
+                localStorage.removeItem('theme_test');
+                isLocalStorageAvailable = true;
+            } catch (e) {
+                isLocalStorageAvailable = false;
+                historyBtn.style.display = 'none'; // Hide history if not available
+            }
+
+            // Apply saved theme or default to system preference
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
+
             if (isLocalStorageAvailable) {
                 renderHistoryList();
             }
