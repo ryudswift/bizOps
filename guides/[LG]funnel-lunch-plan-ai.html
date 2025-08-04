@@ -1,153 +1,158 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SudoDev AI Automation Funnel Launch Plan (Dark Mode)</title>
+    <title>SudoDev AI Automation Funnel Launch Plan v1.01</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #f8fafc; /* slate-50 */
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9; /* slate-100 */
+            --bg-hover: #f1f5f9; /* slate-100 */
+            --text-primary: #0f172a; /* slate-900 */
+            --text-secondary: #475569; /* slate-600 */
+            --text-accent: #4f46e5; /* indigo-600 */
+            --border-primary: #e2e8f0; /* slate-200 */
+            --shadow-color: rgba(79, 70, 229, 0.1);
+        }
+
+        html.dark {
+            --bg-primary: #0f172a; /* slate-900 */
+            --bg-secondary: #1e293b; /* slate-800 */
+            --bg-tertiary: #334155; /* slate-700 */
+            --bg-hover: #33415566; /* slate-700 with opacity */
+            --text-primary: #f1f5f9; /* slate-100 */
+            --text-secondary: #94a3b8; /* slate-400 */
+            --text-accent: #818cf8; /* indigo-400 */
+            --border-primary: #334155; /* slate-700 */
+            --shadow-color: rgba(99, 102, 241, 0.1);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* slate-900 */
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
+        
         .task-checkbox {
-            -webkit-appearance: none;
-            appearance: none;
-            background-color: #1e293b; /* slate-800 */
-            margin: 0;
-            font: inherit;
-            color: currentColor;
-            width: 1.25em;
-            height: 1.25em;
-            border: 0.15em solid #475569; /* slate-600 */
+            -webkit-appearance: none; appearance: none; margin: 0; font: inherit;
+            color: currentColor; width: 1.25em; height: 1.25em;
+            transform: translateY(-0.075em); display: grid; place-content: center;
+            cursor: pointer; transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
+            background-color: var(--bg-secondary);
+            border: 0.15em solid var(--border-primary);
             border-radius: 0.5em;
-            transform: translateY(-0.075em);
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
         }
         .task-checkbox::before {
-            content: "";
-            width: 0.65em;
-            height: 0.65em;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em #818cf8; /* indigo-400 */
+            content: ""; width: 0.65em; height: 0.65em;
+            transform: scale(0); transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--text-accent);
             transform-origin: bottom left;
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         }
-        .task-checkbox:checked::before {
-            transform: scale(1);
-        }
-        .task-checkbox:checked {
-            background-color: #3730a3; /* indigo-800 */
-            border-color: #818cf8; /* indigo-400 */
-        }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding-top 0.5s, padding-bottom 0.5s;
-        }
-        .accordion-item.active .accordion-content {
-            padding-top: 0.5rem;
-            padding-bottom: 1.5rem;
-            max-height: 1000px; /* Adjust as needed for content */
-        }
-        .accordion-icon {
-            transition: transform 0.3s ease-in-out;
-        }
-        .accordion-item.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-        /* Modal styles */
-        .modal-overlay {
-            transition: opacity 0.3s ease;
-        }
-        .modal-content {
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        .gemini-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .gemini-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
-        }
-        .spinner {
-            border-top-color: #818cf8; /* indigo-400 */
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .task-checkbox:checked::before { transform: scale(1); }
+        .task-checkbox:checked { background-color: #4f46e533; border-color: var(--text-accent); }
+
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding-top 0.5s, padding-bottom 0.5s; }
+        .accordion-item.active .accordion-content { padding-top: 0.5rem; padding-bottom: 1.5rem; max-height: 1000px; }
+        .accordion-icon { transition: transform 0.3s ease-in-out; }
+        .accordion-item.active .accordion-icon { transform: rotate(180deg); }
+        
+        .modal-overlay { transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; }
+        .gemini-button { transition: all 0.2s ease-in-out; }
+        .gemini-button:hover { transform: scale(1.05); box-shadow: 0 4px 20px var(--shadow-color); }
+        
+        .spinner { border-top-color: var(--text-accent); animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-300">
+<body class="bg-slate-100 text-slate-800">
 
     <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-400">AI Automation Funnel Launch Plan</h1>
-            <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Your interactive checklist for building the SudoDev empire, supercharged with AI.</p>
+        <header class="mb-10">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl sm:text-4xl font-bold text-[--text-accent]">Launch Plan</h1>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button id="theme-switcher" class="p-2 rounded-full hover:bg-[--bg-hover] text-[--text-secondary] transition-colors">
+                        <svg id="theme-icon-sun" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg id="theme-icon-moon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <button id="settings-btn" class="p-2 rounded-full hover:bg-[--bg-hover] text-[--text-secondary] transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-[--text-secondary] mt-2 max-w-2xl text-center mx-auto">Your interactive SudoDev checklist, supercharged with AI.</p>
         </header>
 
         <!-- Progress Section -->
-        <div class="mb-10 p-6 bg-slate-800 rounded-2xl shadow-2xl shadow-indigo-900/10">
+        <div class="mb-10 p-6 bg-[--bg-secondary] rounded-2xl shadow-lg shadow-[--shadow-color]">
             <div class="flex justify-between items-center mb-3">
-                 <h2 class="text-lg font-semibold text-slate-200">Overall Progress</h2>
-                 <p id="progress-text" class="text-lg font-bold text-indigo-400">0%</p>
+                 <h2 class="text-lg font-semibold text-[--text-primary]">Overall Progress</h2>
+                 <p id="progress-text" class="text-lg font-bold text-[--text-accent]">0%</p>
             </div>
-            <div class="w-full bg-slate-700 rounded-full h-3">
+            <div class="w-full bg-[--bg-tertiary] rounded-full h-3">
                 <div id="progress-bar" class="bg-indigo-500 h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
             </div>
         </div>
 
         <main id="task-list" class="space-y-4">
-            <!-- Loading State -->
-            <div id="loading-state" class="text-center p-8">
-                <p class="text-slate-500">Loading your progress...</p>
-            </div>
+            <div id="loading-state" class="text-center p-8"><p class="text-[--text-secondary]">Loading your progress...</p></div>
         </main>
         
-        <footer class="text-center mt-12">
-            <p class="text-sm text-slate-500">Powered by SudoDev & Gemini</p>
-        </footer>
+        <footer class="text-center mt-12"><p class="text-sm text-slate-500">SudoDev Launch Plan v1.01</p></footer>
     </div>
 
-    <!-- Gemini Modal -->
+    <!-- Modals -->
     <div id="gemini-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div class="modal-content bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 transform scale-95 opacity-0">
+        <div class="modal-content bg-[--bg-secondary] border border-[--border-primary] rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 transform scale-95 opacity-0">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-indigo-400 flex items-center">
+                <h3 class="text-xl font-bold text-[--text-accent] flex items-center">
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path></svg>
                     AI Assistant
                 </h3>
-                <button id="close-modal-btn" class="text-slate-500 hover:text-slate-300 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button class="close-modal-btn text-[--text-secondary] hover:text-[--text-primary] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div id="gemini-output" class="prose prose-invert max-w-none h-96 overflow-y-auto bg-slate-900 p-4 rounded-lg border border-slate-700">
-                <!-- AI content will be injected here -->
-            </div>
+            <div id="gemini-output" class="prose max-w-none h-96 overflow-y-auto bg-[--bg-primary] p-4 rounded-lg border border-[--border-primary] text-[--text-primary]"></div>
             <div class="mt-6 flex justify-end">
-                 <button id="copy-to-clipboard-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-500 transition-colors gemini-button focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Copy to Clipboard
-                </button>
+                 <button id="copy-to-clipboard-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition-colors gemini-button focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Copy</button>
             </div>
         </div>
     </div>
 
+    <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-[--bg-secondary] border border-[--border-primary] rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-[--text-accent] flex items-center">Settings</h3>
+                <button class="close-modal-btn text-[--text-secondary] hover:text-[--text-primary] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div>
+                <label for="api-key-input" class="block text-sm font-medium text-[--text-primary] mb-2">Gemini API Key (Session Only)</label>
+                <input type="password" id="api-key-input" class="w-full px-3 py-2 bg-[--bg-primary] border border-[--border-primary] rounded-lg text-[--text-primary] focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste your API key here">
+                <p class="text-xs text-[--text-secondary] mt-2">Your key is only stored for this browser session and is not saved anywhere else.</p>
+            </div>
+            <div class="mt-6 flex justify-end">
+                 <button id="save-settings-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition-colors gemini-button focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- DATA STRUCTURE ---
-        const projectPlan = {
-            phases: [
+        const projectPlan = { /* ... same data structure as before ... */ };
+        projectPlan.phases = [
                 {
                     title: "Part 1: Foundational Brand & Content Setup",
                     weeks: "Weeks 1-2",
@@ -194,43 +199,99 @@
                         ]}
                     ]
                 }
-            ]
+            ];
+
+        // --- STATE MANAGEMENT ---
+        let db, auth, userId = null, docRef = null, allCheckboxes = [];
+        let sessionApiKey = null;
+
+        // --- THEME MANAGEMENT ---
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        }
+
+        themeSwitcher.addEventListener('click', () => {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        // --- MODAL MANAGEMENT ---
+        const modals = {
+            gemini: document.getElementById('gemini-modal'),
+            settings: document.getElementById('settings-modal')
         };
 
-        // --- UI RENDERING ---
-        const taskListContainer = document.getElementById('task-list');
-        const loadingState = document.getElementById('loading-state');
+        function showModal(modalId) {
+            const modal = modals[modalId];
+            if (modal) {
+                modal.classList.remove('pointer-events-none', 'opacity-0');
+                modal.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+            }
+        }
 
+        function hideAllModals() {
+            Object.values(modals).forEach(modal => {
+                modal.classList.add('pointer-events-none', 'opacity-0');
+                modal.querySelector('.modal-content').classList.add('scale-95', 'opacity-0');
+            });
+        }
+        
+        document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', hideAllModals));
+        document.getElementById('settings-btn').addEventListener('click', () => showModal('settings'));
+        
+        const apiKeyInput = document.getElementById('api-key-input');
+        document.getElementById('save-settings-btn').addEventListener('click', () => {
+            sessionApiKey = apiKeyInput.value.trim();
+            apiKeyInput.value = ''; // Clear for security
+            hideAllModals();
+        });
+
+        // --- UI RENDERING ---
         function renderPlan() {
+            const taskListContainer = document.getElementById('task-list');
             let html = '';
             projectPlan.phases.forEach((phase) => {
                 html += `
-                    <div class="bg-slate-800 rounded-2xl shadow-2xl shadow-indigo-900/10 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-slate-700">
-                            <h2 class="text-xl sm:text-2xl font-bold text-slate-100">${phase.title}</h2>
-                            <p class="text-sm text-slate-400 font-medium">${phase.weeks}</p>
+                    <div class="bg-[--bg-secondary] rounded-2xl shadow-lg shadow-[--shadow-color] overflow-hidden mb-6">
+                        <div class="p-6 border-b border-[--border-primary]">
+                            <h2 class="text-xl sm:text-2xl font-bold text-[--text-primary]">${phase.title}</h2>
+                            <p class="text-sm text-[--text-secondary] font-medium">${phase.weeks}</p>
                         </div>
                         <div>
                             ${phase.tasks.map(task => `
-                                <div class="accordion-item border-b border-slate-700 last:border-b-0" id="${task.id}">
-                                    <div class="accordion-header w-full flex justify-between items-center text-left p-6 hover:bg-slate-700/50 focus:outline-none cursor-pointer transition-colors">
+                                <div class="accordion-item border-b border-[--border-primary] last:border-b-0" id="${task.id}">
+                                    <div class="accordion-header w-full flex justify-between items-center text-left p-6 hover:bg-[--bg-hover] focus:outline-none cursor-pointer transition-colors">
                                         <div class="flex items-center">
-                                            <button class="gemini-post-btn p-2 rounded-full hover:bg-indigo-900/50 transition-colors" data-task-title="${task.title}" title="Draft announcement post">
-                                                <svg class="w-5 h-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path></svg>
+                                            <button class="gemini-post-btn p-2 rounded-full hover:bg-indigo-500/20 transition-colors" data-task-title="${task.title}" title="Draft announcement post">
+                                                <svg class="w-5 h-5 text-[--text-accent]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path></svg>
                                             </button>
-                                            <span class="ml-4 text-base sm:text-lg font-semibold text-slate-200">${task.title}</span>
+                                            <span class="ml-4 text-base sm:text-lg font-semibold text-[--text-primary]">${task.title}</span>
                                         </div>
                                         <svg class="accordion-icon w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                     <div class="accordion-content px-6">
                                         <div class="space-y-4 pb-2">
                                             ${task.actions.map(action => `
-                                                <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/70 border border-slate-700">
+                                                <div class="flex items-center justify-between p-3 rounded-lg bg-[--bg-primary] border border-[--border-primary]">
                                                     <label for="${action.id}" class="flex items-start cursor-pointer flex-grow">
                                                         <input type="checkbox" id="${action.id}" class="task-checkbox mt-1 flex-shrink-0">
-                                                        <span class="ml-4 text-slate-300">${action.text}</span>
+                                                        <span class="ml-4 text-[--text-secondary]">${action.text}</span>
                                                     </label>
-                                                    ${action.gemini === 'ideas' ? `<button class="gemini-ideas-btn bg-indigo-500/20 text-indigo-300 text-sm font-semibold py-1.5 px-4 rounded-full hover:bg-indigo-500/40 transition-colors gemini-button">Generate Ideas</button>` : ''}
+                                                    ${action.gemini === 'ideas' ? `<button class="gemini-ideas-btn bg-indigo-500/20 text-[--text-accent] text-sm font-semibold py-1.5 px-4 rounded-full hover:bg-indigo-500/40 transition-colors gemini-button">Generate Ideas</button>` : ''}
                                                 </div>
                                             `).join('')}
                                         </div>
@@ -242,43 +303,16 @@
                 `;
             });
             taskListContainer.innerHTML = html;
-            loadingState.style.display = 'none';
+            document.getElementById('loading-state').style.display = 'none';
         }
 
-        // --- GEMINI API & MODAL LOGIC ---
-        const geminiModal = document.getElementById('gemini-modal');
-        const geminiOutput = document.getElementById('gemini-output');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const copyToClipboardBtn = document.getElementById('copy-to-clipboard-btn');
-
-        function showModal() {
-            geminiModal.classList.remove('pointer-events-none', 'opacity-0');
-            geminiModal.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
-        }
-
-        function hideModal() {
-            geminiModal.classList.add('pointer-events-none', 'opacity-0');
-            geminiModal.querySelector('.modal-content').classList.add('scale-95', 'opacity-0');
-        }
-
-        closeModalBtn.addEventListener('click', hideModal);
-        copyToClipboardBtn.addEventListener('click', () => {
-            const textToCopy = geminiOutput.innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-            copyToClipboardBtn.textContent = 'Copied!';
-            setTimeout(() => { copyToClipboardBtn.textContent = 'Copy to Clipboard'; }, 2000);
-        });
-
+        // --- GEMINI API LOGIC ---
         async function callGemini(prompt, maxRetries = 3) {
+            const geminiOutput = document.getElementById('gemini-output');
             geminiOutput.innerHTML = '<div class="flex justify-center items-center h-full"><div class="spinner w-12 h-12 rounded-full border-4 border-slate-600"></div></div>';
-            showModal();
+            showModal('gemini');
 
-            const apiKey = ""; // Canvas will provide the key
+            const apiKey = sessionApiKey || ""; // Use session key if available
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             
@@ -291,18 +325,15 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
                     }
 
                     const result = await response.json();
                     
                     if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
                         const text = result.candidates[0].content.parts[0].text;
-                        let html = text
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                            .replace(/^(#{1,6})\s*(.*)/gm, (match, hashes, content) => `<h${hashes.length} class="font-bold text-lg mt-4 mb-2">${content}</h${hashes.length}>`)
-                            .replace(/\n/g, '<br>');
+                        let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
                         geminiOutput.innerHTML = html;
                         return;
                     } else {
@@ -311,7 +342,7 @@
                 } catch (error) {
                     console.error(`Gemini API call failed (attempt ${i + 1}):`, error);
                     if (i === maxRetries - 1) {
-                        geminiOutput.innerHTML = `<p class="text-red-400">Sorry, the AI assistant is currently unavailable. Please try again later.</p><p class="text-xs text-slate-500 mt-2">${error.message}</p>`;
+                        geminiOutput.innerHTML = `<p class="text-red-400">Sorry, the AI assistant is currently unavailable. Please check your API key or try again later.</p><p class="text-xs text-slate-500 mt-2">${error.message}</p>`;
                         return;
                     }
                     await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
@@ -319,48 +350,14 @@
             }
         }
 
-        // --- APPLICATION LOGIC ---
-        let db, auth;
-        let userId = null;
-        let docRef = null;
-        let allCheckboxes = [];
-
-        function updateProgress() {
-            const checkedCount = allCheckboxes.filter(cb => cb.checked).length;
-            const totalCount = allCheckboxes.length;
-            const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
-            
-            document.getElementById('progress-bar').style.width = `${percentage}%`;
-            document.getElementById('progress-text').textContent = `${percentage}%`;
-        }
+        // --- APPLICATION LOGIC & EVENT LISTENERS ---
+        function updateProgress() { /* ... same as before ... */ }
+        async function saveProgress() { /* ... same as before ... */ }
+        function loadProgress(progressData) { /* ... same as before ... */ }
         
-        async function saveProgress() {
-            if (!docRef) return;
-            const progress = {};
-            allCheckboxes.forEach(cb => { progress[cb.id] = cb.checked; });
-            try {
-                await setDoc(docRef, { progress });
-            } catch (error) {
-                console.error("Error saving progress: ", error);
-            }
-        }
-
-        function loadProgress(progressData) {
-            if (!progressData) return;
-            allCheckboxes.forEach(cb => {
-                if (progressData[cb.id]) cb.checked = true;
-            });
-            updateProgress();
-        }
-
         function setupEventListeners() {
             allCheckboxes = Array.from(document.querySelectorAll('.task-checkbox'));
-            allCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    updateProgress();
-                    saveProgress();
-                });
-            });
+            allCheckboxes.forEach(checkbox => checkbox.addEventListener('change', () => { updateProgress(); saveProgress(); }));
 
             document.querySelectorAll('.accordion-header').forEach(header => {
                 header.addEventListener('click', (e) => {
@@ -370,32 +367,37 @@
             });
 
             document.querySelector('.gemini-ideas-btn')?.addEventListener('click', () => {
-                const prompt = `
-                    You are a viral marketing expert for an AI Automation consultant (SudoDev). 
-                    Generate 10 engaging, short-form video ideas (for Reels/Shorts) to attract solopreneurs and small business owners.
-                    The content pillars are: Lead Aggregation, Lead Enrichment, Outreach Automation, Meeting Prep, and general n8n/AI tips.
-                    Format the output as a numbered list with a catchy title for each idea. Make the titles bold.
-                `;
+                const prompt = `You are a viral marketing expert for an AI Automation consultant (SudoDev). Generate 10 engaging, short-form video ideas (for Reels/Shorts) to attract solopreneurs and small business owners. The content pillars are: Lead Aggregation, Lead Enrichment, Outreach Automation, Meeting Prep, and general n8n/AI tips. Format the output as a numbered list with a catchy title for each idea. Make the titles bold.`;
                 callGemini(prompt);
             });
 
             document.querySelectorAll('.gemini-post-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const taskTitle = btn.dataset.taskTitle;
-                    const prompt = `
-                        You are a social media manager for SudoDev, an AI Automation consultancy.
-                        Draft a short, exciting, and slightly technical social media post (for Instagram or Twitter) announcing progress on the business launch.
-                        The task just completed is: "${taskTitle}".
-                        Frame it as a "building in public" update. Make it sound like an expert sharing their journey.
-                        Include relevant hashtags like #AIautomation, #n8n, #BuildInPublic, #SudoDev.
-                    `;
+                    const prompt = `You are a social media manager for SudoDev, an AI Automation consultancy. Draft a short, exciting, and slightly technical social media post (for Instagram or Twitter) announcing progress on the business launch. The task just completed is: "${taskTitle}". Frame it as a "building in public" update. Make it sound like an expert sharing their journey. Include relevant hashtags like #AIautomation, #n8n, #BuildInPublic, #SudoDev.`;
                     callGemini(prompt);
                 });
             });
+            
+            document.getElementById('copy-to-clipboard-btn').addEventListener('click', () => {
+                const textToCopy = document.getElementById('gemini-output').innerText;
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                const btn = document.getElementById('copy-to-clipboard-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+            });
         }
-
+        
         // --- FIREBASE INITIALIZATION ---
         async function initialize() {
+            // Apply saved theme on initial load
+            applyTheme(localStorage.getItem('theme') || 'dark'); // Default to dark
+
             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             const firebaseConfig = typeof __firebase_config !== 'undefined' 
                 ? JSON.parse(__firebase_config) 
@@ -409,8 +411,7 @@
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
-                        // Use a different doc path for dark mode progress
-                        docRef = doc(db, "artifacts", appId, "public/data/project_tracker_dark", userId);
+                        docRef = doc(db, "artifacts", appId, "public/data/project_tracker_v1_01", userId);
                         
                         renderPlan();
                         setupEventListeners();
@@ -429,7 +430,7 @@
                         renderPlan();
                         setupEventListeners();
                         console.log("User is not signed in. Progress will not be saved.");
-                        loadingState.style.display = 'none';
+                        document.getElementById('loading-state').style.display = 'none';
                     }
                 });
                 
@@ -444,8 +445,37 @@
                 console.error("Firebase initialization failed:", error);
                 renderPlan();
                 setupEventListeners();
-                loadingState.innerHTML = '<p class="text-red-400">Could not connect to database. Progress will not be saved.</p>';
+                document.getElementById('loading-state').innerHTML = '<p class="text-red-400">Could not connect to database. Progress will not be saved.</p>';
             }
+        }
+        
+        // Re-usable functions that were removed for brevity in the thought process
+        updateProgress = function() {
+            const checkedCount = allCheckboxes.filter(cb => cb.checked).length;
+            const totalCount = allCheckboxes.length;
+            const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+            
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = `${percentage}%`;
+        }
+        
+        saveProgress = async function() {
+            if (!docRef) return;
+            const progress = {};
+            allCheckboxes.forEach(cb => { progress[cb.id] = cb.checked; });
+            try {
+                await setDoc(docRef, { progress });
+            } catch (error) {
+                console.error("Error saving progress: ", error);
+            }
+        }
+
+        loadProgress = function(progressData) {
+            if (!progressData) return;
+            allCheckboxes.forEach(cb => {
+                if (progressData[cb.id]) cb.checked = true;
+            });
+            updateProgress();
         }
 
         // Start the application
